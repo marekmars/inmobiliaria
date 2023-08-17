@@ -2,6 +2,15 @@ html {
   font-size: 14px;
   
 }
+.img-logo{ 
+  height: 10vh;
+}
+.img-fondo{
+  width: 100%;
+}
+.fs-7{
+  font-size: 0.8rem;
+}
 
 @media (min-width: 768px) {
   html {
@@ -22,4 +31,6 @@ body {
   margin-bottom: 60px;
   
 }
+
+
 

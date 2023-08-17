@@ -33,8 +33,27 @@ public class InquilinosController : Controller
         try
         {
             InquilinosRepository repo = new();
-            repo.CreateInquilino(inquilino);
-            return RedirectToAction("Index");
+            var res = repo.CreateInquilino(inquilino);
+            if (res > 0)
+            {
+
+                TempData["AlertMessage"] = "Inquilino creado correctamente.";
+                TempData["AlertType"] = "success";
+                return RedirectToAction("Index");
+            }
+            else if (res == -1)
+            {
+                TempData["AlertMessage"] = "No se pudo crear el inquilino.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Create");
+            }
+            else
+            {
+                TempData["AlertMessage"] = "Ya existe un inquilino con ese DNI.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Create");
+            }
+
         }
         catch (System.Exception)
         {
@@ -48,6 +67,7 @@ public class InquilinosController : Controller
     {
         try
         {
+
             InquilinosRepository repo = new();
             repo.DeleteInquilino(id);
             return RedirectToAction("Index");
@@ -60,17 +80,44 @@ public class InquilinosController : Controller
     public IActionResult Update(int id)
     {
         InquilinosRepository repo = new();
-        var inquilino = repo.GetInquilinoById(id);   
+        var inquilino = repo.GetInquilinoById(id);
         return View(inquilino);
     }
-    
+
 
     [HttpPost]
     public IActionResult Update(Inquilino inquilino)
     {
-        InquilinosRepository repo = new();
-        repo.UpdateInquilino(inquilino);   
-        return RedirectToAction("Index");
+        try
+        {
+            InquilinosRepository repo = new();
+            int res = repo.UpdateInquilino(inquilino);
+
+            if (res > 0)
+            {
+                TempData["AlertMessage"] = "Inquilino modificado correctamente.";
+                TempData["AlertType"] = "success";
+                return RedirectToAction("Index");
+            }
+            else if (res == -1)
+            {
+                TempData["AlertMessage"] = "No se pudo modificar el inquilino.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Update");
+            }
+            else 
+            {
+                TempData["AlertMessage"] = "No se pudo modificar, ya existe un inquilino con ese DNI.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Update");
+            }
+        }
+        catch (System.Exception)
+        {
+
+            throw;
+        }
+
     }
 
     public IActionResult Privacy()

@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using Inmobiliaria.Models;
 using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient; // Asegúrate de tener la referencia correcta a MySql.Data
+using MySql.Data.MySqlClient;
+using System.Text.RegularExpressions;
 
 namespace Inmobiliaria.Models;
 public class InquilinosRepository
@@ -52,7 +53,7 @@ public class InquilinosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM inquilinos WHERE id=@id ORDER BY apellido";
+            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM inquilinos WHERE id=@id";
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -78,31 +79,100 @@ public class InquilinosRepository
         }
         return inquilino;
     }
+    public Inquilino GetInquilinoByDni(string dni)
+    {
+        Inquilino inquilino = new();
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            connection.Open();
+            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM inquilinos WHERE dni=@dni";
+
+            using (MySqlCommand command = new(query, connection))
+            {
+                command.Parameters.AddWithValue("@dni", dni);
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        inquilino = new()
+                        {
+                            Id = reader.GetInt32("id"),
+                            Dni = reader.GetString("dni"),
+                            Apellido = reader.GetString("apellido"),
+                            Nombre = reader.GetString("nombre"),
+                            Telefono = reader.GetString("telefono"),
+                            Correo = reader.GetString("correo"),
+                        };
+
+                    }
+                    connection.Close();
+                }
+            }
+        }
+        return inquilino;
+    }
 
     public int CreateInquilino(Inquilino inquilino)
     {
         var res = -1;
-        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        if (!EsNumeroTelefonoValido(inquilino.Telefono))
         {
-            string query = @"INSERT INTO `inquilinos`( `dni`, `apellido`, `nombre`, `telefono`, `correo`) 
+            return res;
+        }
+
+        // Verificar si el correo electrónico es válido
+        if (!EsCorreoElectronicoValido(inquilino.Correo))
+        {
+            return res;
+        }
+
+        // Verificar si el DNI es válido
+        if (!EsDniValido(inquilino.Dni))
+        {
+            return res;
+        }
+
+        Inquilino inquilinoAux = GetInquilinoByDni(inquilino.Dni);
+
+    
+
+        try
+        {
+            if (inquilinoAux.Nombre == "")
+            {
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    string query = @"INSERT INTO `inquilinos`( `dni`, `apellido`, `nombre`, `telefono`, `correo`) 
             VALUES (@Dni, @Apellido, @Nombre, @Telefono, @Correo);
             SELECT LAST_INSERT_ID()";
 
-            using (MySqlCommand command = new(query, connection))
-            {
-                command.Parameters.AddWithValue("@Dni", inquilino.Dni);
-                command.Parameters.AddWithValue("@Apellido", inquilino.Apellido);
-                command.Parameters.AddWithValue("@Nombre", inquilino.Nombre);
-                command.Parameters.AddWithValue("@Telefono", inquilino.Telefono);
-                command.Parameters.AddWithValue("@Correo", inquilino.Correo);
-                connection.Open();
-                res = Convert.ToInt32(command.ExecuteScalar());
-                inquilino.Id = res;
-                connection.Close();
+                    using (MySqlCommand command = new(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Dni", inquilino.Dni);
+                        command.Parameters.AddWithValue("@Apellido", inquilino.Apellido);
+                        command.Parameters.AddWithValue("@Nombre", inquilino.Nombre);
+                        command.Parameters.AddWithValue("@Telefono", inquilino.Telefono);
+                        command.Parameters.AddWithValue("@Correo", inquilino.Correo);
+                        connection.Open();
+                        res = Convert.ToInt32(command.ExecuteScalar());
+                        inquilino.Id = res;
+                        connection.Close();
 
+                    }
+                }
+            }else{
+                res = -2;
             }
 
         }
+      
+        catch (System.Exception)
+        {
+            throw;
+        }
+
+
+
         return res;
 
     }
@@ -131,9 +201,30 @@ public class InquilinosRepository
     public int UpdateInquilino(Inquilino inquilino)
     {
         var res = -1;
-        using (MySqlConnection connection = new MySqlConnection(connectionString))
+
+        if (!EsNumeroTelefonoValido(inquilino.Telefono))
         {
-            string query = @"UPDATE `inquilinos` SET 
+            return res;
+        }
+
+        // Verificar si el correo electrónico es válido
+        if (!EsCorreoElectronicoValido(inquilino.Correo))
+        {
+            return res;
+        }
+
+        // Verificar si el DNI es válido
+        if (!EsDniValido(inquilino.Dni))
+        {
+            return res;
+        }
+        Inquilino inquilinoAux = GetInquilinoByDni(inquilino.Dni);
+
+        if (inquilinoAux.Nombre == ""||inquilinoAux.Id==inquilino.Id)
+        {
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                string query = @"UPDATE `inquilinos` SET 
                         `dni` = @Dni,
                         `apellido` = @Apellido,
                         `nombre` = @Nombre,
@@ -141,21 +232,46 @@ public class InquilinosRepository
                         `correo` = @Correo
                         WHERE `id` = @Id";
 
-            using (MySqlCommand command = new(query, connection))
-            {
-                command.Parameters.AddWithValue("@Id", inquilino.Id);
-                command.Parameters.AddWithValue("@Dni", inquilino.Dni);
-                command.Parameters.AddWithValue("@Apellido", inquilino.Apellido);
-                command.Parameters.AddWithValue("@Nombre", inquilino.Nombre);
-                command.Parameters.AddWithValue("@Telefono", inquilino.Telefono);
-                command.Parameters.AddWithValue("@Correo", inquilino.Correo);
-                connection.Open();
-                res = command.ExecuteNonQuery();
-                connection.Close();  
-            }
+                using (MySqlCommand command = new(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", inquilino.Id);
+                    command.Parameters.AddWithValue("@Dni", inquilino.Dni);
+                    command.Parameters.AddWithValue("@Apellido", inquilino.Apellido);
+                    command.Parameters.AddWithValue("@Nombre", inquilino.Nombre);
+                    command.Parameters.AddWithValue("@Telefono", inquilino.Telefono);
+                    command.Parameters.AddWithValue("@Correo", inquilino.Correo);
+                    connection.Open();
+                    res = command.ExecuteNonQuery();
+                    connection.Close();
+                }
 
+            }
+        }
+        else
+        {
+            return -2;
         }
         return res;
 
+    }
+    private bool EsNumeroTelefonoValido(string telefono)
+    {
+
+        string patron = @"^\+\d{2} \d{2,3}-\d{6,7}$";
+        return Regex.IsMatch(telefono, patron);
+    }
+
+    private bool EsCorreoElectronicoValido(string correo)
+    {
+        // Patrón de expresión regular para validar una dirección de correo electrónico
+        string patron = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+        return Regex.IsMatch(correo, patron);
+    }
+
+    private bool EsDniValido(string dni)
+    {
+        // Patrón de expresión regular para validar un DNI argentino (formato: XX.XXX.XXX)
+        string patron = @"^\d{2}\.\d{3}\.\d{3}$";
+        return Regex.IsMatch(dni, patron);
     }
 }

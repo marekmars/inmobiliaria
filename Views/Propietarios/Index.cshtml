@@ -47,7 +47,7 @@
                               </button>
                           </form>
                          <div >
-                           <a href="/Update/@propietario.Id" class="btn btn-primary w-75  d-flex justify-content-center align-items-center"> <i class="fa-regular fa-pen-to-square" style="cursor:pointer;"></i> </a>
+                           <a href="Propietarios/Update/@propietario.Id" class="btn btn-primary w-75  d-flex justify-content-center align-items-center"> <i class="fa-regular fa-pen-to-square" style="cursor:pointer;"></i> </a>
                          </div>
                     </td>
                 </tr>
@@ -55,4 +55,21 @@
         </tbody>
     </table>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      @if (TempData.ContainsKey("AlertMessage") && TempData.ContainsKey("AlertType"))
+      {
+          var alertMessage = TempData["AlertMessage"];
+          var alertType = TempData["AlertType"];
+          <text>
+              Swal.fire({
+                  icon: '@alertType',
+                  title: '@alertMessage',
+                  showConfirmButton: false,
+                  timer: 2000 // Mostrar durante 2 segundos
+              });
+          </text>
+      }
+    </script>
 

@@ -20,12 +20,12 @@
            
            <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
                <input id="dni" class="form-control" type="text" name="dni" placeholder="asd" required>
-               <label for="dni" class="ms-2">DNI</label>
+               <label for="dni" class="ms-2">DNI <span class="fs-7">(formato: XX.XXX.XXX)</span></label>
            </div>
            
            <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
                <input id="telefono" class="form-control" type="tel" name="telefono" placeholder="asd" required>
-               <label for="telefono" class="ms-2">Teléfono</label>
+               <label for="telefono" class="ms-2">Teléfono <span class="fs-7">(Formato +XX XXX-XXXXXXX)</span></label>
            </div>
            
            <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
@@ -33,10 +33,28 @@
                <label for="correo" class="ms-2">Correo</label>
            </div>
            <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
-               <button type="submit" class="btn btn-primary mx-auto" style="width: 8vw;">Registrar</button>
+               <button type="button" class="btn btn-primary mx-auto" style="width: fit-content;" onclick="window.location.href = '/Propietarios'">Volver</button>
+               <button type="submit" class="btn btn-primary mx-auto" style="width: fit-content;">Registrar</button>
            </div>
             
       </form>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      @if (TempData.ContainsKey("AlertMessage") && TempData.ContainsKey("AlertType"))
+      {
+          var alertMessage = TempData["AlertMessage"];
+          var alertType = TempData["AlertType"];
+          <text>
+              Swal.fire({
+                  icon: '@alertType',
+                  title: '@alertMessage',
+                  showConfirmButton: false,
+                  timer: 2000 // Mostrar durante 2 segundos
+              });
+          </text>
+      }
+    </script>
 
