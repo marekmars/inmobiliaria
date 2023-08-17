@@ -107,6 +107,13 @@ public class PropietariosController : Controller
         }
     }
 
+     public IActionResult Details(int id)
+    {
+        PropietariosRepository repo = new();
+        var propietario = repo.GetPropietarioById(id);
+        return View(propietario);
+    }
+
 
     public IActionResult Privacy()
     {

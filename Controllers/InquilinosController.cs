@@ -120,6 +120,13 @@ public class InquilinosController : Controller
 
     }
 
+     public IActionResult Details(int id)
+    {
+        InquilinosRepository repo = new();
+        var inquilino = repo.GetInquilinoById(id);
+        return View(inquilino);
+    }
+
     public IActionResult Privacy()
     {
         return View();
