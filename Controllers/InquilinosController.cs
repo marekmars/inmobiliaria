@@ -27,6 +27,7 @@ public class InquilinosController : Controller
 
         return View();
     }
+    
     [HttpPost]
     public IActionResult Create(Inquilino inquilino)
     {
@@ -101,7 +102,7 @@ public class InquilinosController : Controller
             }
             else if (res == -1)
             {
-                TempData["AlertMessage"] = "No se pudo modificar el inquilino.";
+                TempData["AlertMessage"] = "No se pudo modificar el inquilino, verifique los datos ingresados.";
                 TempData["AlertType"] = "error";
                 return RedirectToAction("Update");
             }
@@ -127,8 +128,4 @@ public class InquilinosController : Controller
         return View(inquilino);
     }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
 }
