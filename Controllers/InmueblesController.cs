@@ -29,24 +29,8 @@ public class InmueblesController : Controller
         return View();
     }
 
-    [HttpGet("api/Inmuebles/GetPropietario/{dni}")]
-    public IActionResult GetPropietario(string dni)
-    {
-        // Aquí, realiza la lógica para buscar el propietario por DNI
-        PropietariosRepository repo = new();
-        Propietario propietarioEncontrado = repo.GetPropietarioByDni(dni); // Tu lógica de búsqueda
 
-        if (propietarioEncontrado != null)
-        {
-            // Retorna el objeto Propietario como JSON
-            return Ok(propietarioEncontrado);
-        }
-        else
-        {
-            return NotFound();
-        }
-    }
-    
+
     [HttpPost]
     public IActionResult Create(Inmueble inmueble)
     {
@@ -61,13 +45,13 @@ public class InmueblesController : Controller
                 TempData["AlertType"] = "success";
                 return RedirectToAction("Index");
             }
-            else 
+            else
             {
                 TempData["AlertMessage"] = "No se pudo crear el inmueble.";
                 TempData["AlertType"] = "error";
                 return RedirectToAction("Create");
             }
-            
+
         }
         catch (System.Exception)
         {
@@ -113,13 +97,13 @@ public class InmueblesController : Controller
             TempData["AlertType"] = "success";
             return RedirectToAction("Index");
         }
-        else 
+        else
         {
             TempData["AlertMessage"] = "No se pudo modificar el inmueble.";
             TempData["AlertType"] = "error";
             return RedirectToAction("Update");
         }
-        
+
     }
 
     public IActionResult Details(int id)
@@ -127,6 +111,24 @@ public class InmueblesController : Controller
         InmueblesRepository repo = new();
         var propietario = repo.GetInmuebleById(id);
         return View(propietario);
+    }
+
+    [HttpGet("api/Inmuebles/GetInmueble/{id}")]
+    public IActionResult GetInmueble(int id)
+    {
+        // Aquí, realiza la lógica para buscar el propietario por DNI
+        InmueblesRepository repo = new();
+        Inmueble inmuebleEncontrado = repo.GetInmuebleById(id); // Tu lógica de búsqueda
+
+        if (inmuebleEncontrado != null)
+        {
+            // Retorna el objeto Propietario como JSON
+            return Ok(inmuebleEncontrado);
+        }
+        else
+        {
+            return NotFound();
+        }
     }
 
 

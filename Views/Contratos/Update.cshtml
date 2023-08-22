@@ -1,0 +1,106 @@
+﻿@model Inmobiliaria.Models.Contrato
+    
+@{
+    ViewData["Title"] = "Modificar Contrato";
+}
+
+<div class="text-center">
+    <h1 class="display-4 mb-5">Modificar Contrato</h1>
+    <div class="container mt-4 ">
+        <form id="form" class="form form-floating d-flex flex-wrap flex-column gap-4" method="post" data-bs-theme="dark" onsubmit="return confirmarModificacion(event)">        
+        
+         <div class="container">
+            <div class="d-flex gap-3 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
+                <input id="busquedaDni" value=@Model.Inquilino.Dni class="form-control" type="text" placeholder="Buscar por DNI" required>
+                <button id="btnRestaurarDni" type="button" class="btn btn-primary"><i class="fa-solid fa-rotate-left"></i></button>
+                <button id="redirCrear" type="button" class="btn btn-success"><i class="fa-solid fa-circle-plus" onclick="window.location.href = '/Inquilinos/Create'"></i></button>
+                <label class="ms-2">Buscar Inquilino por DNI <span class="fs-7">(formato: XX.XXX.XXX)</span></label>
+            </div>
+
+            <div id="cardInquilino" class="card col-md-8 mx-auto mt-3">
+              <div class="card-header">
+                  Detalles del Inquilino
+              </div>
+              <div class="card-body ">
+                  <p class="card-text fw-bold">Nombre: <span class="fw-normal" id="inquilinoNombre">@Model.Inquilino.Nombre</span></p>
+                  <p class="card-text fw-bold">Apellido: <span class="fw-normal" id="inquilinoApellido">@Model.Inquilino.Apellido</span></p>
+                  <p class="card-text fw-bold">Correo: <span class="fw-normal" id="inquilinoCorreo">@Model.Inquilino.Correo</span></p>
+                  <p class="card-text fw-bold">Telefono: <span  class="fw-normal" id="inquilinoTelefono">@Model.Inquilino.Telefono</span></p>         
+              </div>
+            </div>
+            <input value=@Model.Inquilino.Id id="idInquilino" class="form-control" type="hidden" name="IdInquilino" required>     
+         </div>
+
+         <div id="modalInmueble"class="container">
+            <div class="d-flex gap-3 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
+                <input id="busquedaId" value=@Model.Inmueble.Id class="form-control" type="text" placeholder="sadas" required>
+                <button id="btnRestaurarInmueble" type="button" class="btn btn-primary"><i class="fa-solid fa-rotate-left"></i></button>
+                <button id="redirCrear" type="button" class="btn btn-success"><i class="fa-solid fa-circle-plus" onclick="window.location.href = '/Inmuebles/Create'"></i></button>
+                <label class="ms-2">Buscar Inmueble por id </label>
+            </div>
+
+            <div id="cardInmueble" class="card col-md-8 mx-auto mt-3">
+              <div class="card-header">
+                  Detalles del Inmueble
+              </div>
+              <div class="card-body">
+                  <p class="card-text fw-bold">Direccion: <span class="fw-normal" id="inmuebleDireccion">@Model.Inmueble.Direccion</span></p>
+                  <p class="card-text fw-bold">Uso: <span class="fw-normal" id="inmuebleUso">@Model.Inmueble.Uso</span></p>
+                  <p class="card-text fw-bold">Tipo: <span class="fw-normal" id="inmuebleTipo">@Model.Inmueble.Tipo</span></p>
+                  <p class="card-text fw-bold">Cantidad de Ambientes: <span class="fw-normal" id="inmuebleCantAmbientes">@Model.Inmueble.CantAmbientes</span></p>
+                  <p class="card-text fw-bold">Latitud: <span class="fw-normal" id="inmuebleLatitud">@Model.Inmueble.Latitud</span></p>
+                  <p class="card-text fw-bold">Longitud: <span class="fw-normal" id="inmuebleLongitud">@Model.Inmueble.Longitud</span></p>
+                  <p class="card-text fw-bold">Precio: <span class="fw-normal" id="inmueblePrecio">$ @Model.Inmueble.Precio </span></p>
+       
+              </div>
+            </div>
+
+            <input value=@Model.Inmueble.Id id="idInmueble" class="form-control" type="hidden" name="IdInmueble" required>
+        </div>
+
+        <div id="fechaInicioContainer" class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
+            <input id="fechaInicio" value="@Model.FechaInicio.ToString("yyyy-MM-dd")" class="form-control" type="date" name="FechaInicio" required>
+            <label for="FechaInicio" class="ms-2">Fecha de Inicio</label>
+        </div>
+        
+        <div id="fechaFinContainer" class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
+            <input id="fechaFin" value="@Model.FechaFin.ToString("yyyy-MM-dd")" class="form-control" type="date" name="FechaFin" min="@Model.FechaInicio.ToString("yyyy-MM-dd")" required>
+            <label for="FechaFin" class="ms-2">Fecha de Finalización</label>
+        </div>
+
+        <div id="estadoSelect" class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center ">
+            <Select class="form-select" name="Estado">
+               <option value=true selected="@(Model.Estado)">Activo</option>
+               <option value=false selected="@(!Model.Estado)">Inactivo</option>
+            </Select>
+            <label for="Estado" class="ms-2">Estado</label>
+        </div>
+        
+        <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center ">
+               <button type="button" class="btn btn-primary mx-auto" style="width: fit-content;" onclick="window.location.href = '/Contratos'"><i class="fa-solid fa-circle-left"></i></i></button>
+               <button id="btnRegistrar" type="submit" class="btn btn-success mx-auto" style="width: fit-content;" disabled><i class="fa-solid fa-file-circle-plus"></i></button>
+        </div>
+            
+      </form>
+  
+    </div>
+
+</div>
+<script src="~/js/buscarInmuebleInquilino.js" asp-append-version="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      @if (TempData.ContainsKey("AlertMessage") && TempData.ContainsKey("AlertType"))
+      {
+          var alertMessage = TempData["AlertMessage"];
+          var alertType = TempData["AlertType"];
+          <text>
+              Swal.fire({
+                  icon: '@alertType',
+                  title: '@alertMessage',
+                  showConfirmButton: false,
+                  timer: 2000 // Mostrar durante 2 segundos
+              });
+          </text>
+      }
+    </script>
+

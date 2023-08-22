@@ -19,25 +19,24 @@
              <label for="nombre" class="ms-2">Nombre</label>
          </div>
          
-         <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
-             <input id="dni" value="@Model.Dni" class="form-control" type="text" name="Dni" placeholder="asd" required>
-             <label for="dni" class="ms-2">DNI <span class="fs-7">(formato: XX.XXX.XXX)</span></label>
+         <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 col-12 text-center">
+             <input id="dni" value="@Model.Dni" class="form-control" type="text" name="Dni" placeholder="asd" pattern="^\d{2}\.\d{3}\.\d{3}$" title="XX.XXX.XXX" required>
+             <label for="dni" class="ms-2 ">DNI <span class="fs-7">(formato: XX.XXX.XXX)</span></label>
          </div>
          
-         <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
-             <input id="telefono" value="@Model.Telefono" class="form-control" type="tel" name="Telefono" placeholder="asd" required>
-             <label for="telefono" class="ms-2">Teléfono <span class="fs-7">(Formato +XX XXX-XXXXXXX)</span></label>
+         <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 col-12 text-center">
+             <input id="telefono" value="@Model.Telefono" class="form-control" type="tel" name="Telefono" placeholder="asd" pattern="^\+\d{2} \d{2,3}-\d{6,7}$" title="+XX XXX-XXXXXXX" required>
+             <label for="telefono" class="ms-2 ">Teléfono <span class="fs-7">(Formato +XX XXX-XXXXXXX)</span></label>
          </div>
          
-         <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
+         <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 col-12 text-center">
              <input id="correo" value="@Model.Correo" class="form-control" type="email" name="Correo" placeholder="asd" required>
-             <label for="correo" class="ms-2">Correo</label>
+             <label for="correo" class="ms-2 ">Correo</label>
          </div>
          <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
              <button type="button" class="btn btn-primary mx-auto" style="width: fit-content;" onclick="window.location.href = '/Inquilinos'"><i class="fa-solid fa-arrow-rotate-left"></i></button>
              <button type="submit" class="btn btn-primary mx-auto" style="width: fit-content;"><i class="fa-solid fa-pen-to-square"></i></button>
          </div>
-       
         
     </form>
     

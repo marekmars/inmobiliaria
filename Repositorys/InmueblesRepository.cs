@@ -127,11 +127,9 @@ public class InmueblesRepository
             return enumValues;
         }
     }
-
     public int CreateInmueble(Inmueble inmueble)
     {
         var res = -1;
-
 
         try
         {

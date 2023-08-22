@@ -117,18 +117,21 @@ public class InquilinosRepository
         var res = -1;
         if (!EsNumeroTelefonoValido(inquilino.Telefono))
         {
+            res=-2;
             return res;
         }
 
         // Verificar si el correo electrónico es válido
         if (!EsCorreoElectronicoValido(inquilino.Correo))
         {
+            res=-3;
             return res;
         }
 
         // Verificar si el DNI es válido
         if (!EsDniValido(inquilino.Dni))
         {
+            res=-4;
             return res;
         }
 
@@ -161,7 +164,7 @@ public class InquilinosRepository
                     }
                 }
             }else{
-                res = -2;
+                res = -5;
             }
 
         }
@@ -202,22 +205,26 @@ public class InquilinosRepository
     {
         var res = -1;
 
-        if (!EsNumeroTelefonoValido(inquilino.Telefono))
+       if (!EsNumeroTelefonoValido(inquilino.Telefono))
         {
+            res=-2;
             return res;
         }
 
         // Verificar si el correo electrónico es válido
         if (!EsCorreoElectronicoValido(inquilino.Correo))
         {
+            res=-3;
             return res;
         }
 
         // Verificar si el DNI es válido
         if (!EsDniValido(inquilino.Dni))
         {
+            res=-4;
             return res;
         }
+        
         Inquilino inquilinoAux = GetInquilinoByDni(inquilino.Dni);
 
         if (inquilinoAux.Nombre == ""||inquilinoAux.Id==inquilino.Id)
@@ -263,14 +270,14 @@ public class InquilinosRepository
 
     private bool EsCorreoElectronicoValido(string correo)
     {
-        // Patrón de expresión regular para validar una dirección de correo electrónico
+        
         string patron = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
         return Regex.IsMatch(correo, patron);
     }
 
     private bool EsDniValido(string dni)
     {
-        // Patrón de expresión regular para validar un DNI argentino (formato: XX.XXX.XXX)
+       
         string patron = @"^\d{2}\.\d{3}\.\d{3}$";
         return Regex.IsMatch(dni, patron);
     }

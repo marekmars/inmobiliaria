@@ -35,6 +35,8 @@ public class InquilinosController : Controller
         {
             InquilinosRepository repo = new();
             var res = repo.CreateInquilino(inquilino);
+            
+
             if (res > 0)
             {
 
@@ -44,13 +46,28 @@ public class InquilinosController : Controller
             }
             else if (res == -1)
             {
-                TempData["AlertMessage"] = "No se pudo crear el inquilino.";
+                TempData["AlertMessage"] = "No se pudo crear el inquilino, Error en la base de datos.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Create");
+            }else if (res == -2)
+            {
+                TempData["AlertMessage"] = "No se pudo crear el inquilino, Ingrese un numero telefonico valido.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Create");
+            }else if (res == -3)
+            {
+                TempData["AlertMessage"] = "No se pudo crear el inquilino, Ingrese un email valido.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Create");
+            }else if (res == -4)
+            {
+                TempData["AlertMessage"] = "No se pudo crear el inquilino, Ingrese un DNI valido.";
                 TempData["AlertType"] = "error";
                 return RedirectToAction("Create");
             }
             else
             {
-                TempData["AlertMessage"] = "Ya existe un inquilino con ese DNI.";
+                TempData["AlertMessage"] = "No se pudo modificar el inquilino, Ya existe un inquilino con ese DNI.";
                 TempData["AlertType"] = "error";
                 return RedirectToAction("Create");
             }
@@ -96,21 +113,37 @@ public class InquilinosController : Controller
 
             if (res > 0)
             {
+
                 TempData["AlertMessage"] = "Inquilino modificado correctamente.";
                 TempData["AlertType"] = "success";
                 return RedirectToAction("Index");
             }
             else if (res == -1)
             {
-                TempData["AlertMessage"] = "No se pudo modificar el inquilino, verifique los datos ingresados.";
+                TempData["AlertMessage"] = "No se pudo modificar el inquilino, Error en la base de datos.";
                 TempData["AlertType"] = "error";
-                return RedirectToAction("Update");
-            }
-            else 
+                return RedirectToAction("Create");
+            }else if (res == -2)
             {
-                TempData["AlertMessage"] = "No se pudo modificar, ya existe un inquilino con ese DNI.";
+                TempData["AlertMessage"] = "No se pudo modificar el inquilino, Ingrese un numero telefonico valido.";
                 TempData["AlertType"] = "error";
-                return RedirectToAction("Update");
+                return RedirectToAction("Create");
+            }else if (res == -3)
+            {
+                TempData["AlertMessage"] = "No se pudo modificar el inquilino, Ingrese un email valido.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Create");
+            }else if (res == -4)
+            {
+                TempData["AlertMessage"] = "No se pudo modificar el inquilino, Ingrese un DNI valido.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Create");
+            }
+            else
+            {
+                TempData["AlertMessage"] = "No se pudo modificar el inquilino, Ya existe un inquilino con ese DNI.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Create");
             }
         }
         catch (System.Exception)
@@ -126,6 +159,26 @@ public class InquilinosController : Controller
         InquilinosRepository repo = new();
         var inquilino = repo.GetInquilinoById(id);
         return View(inquilino);
+    }
+
+    //APIS
+
+    [HttpGet("api/Inquilios/GetInquilino/{dni}")]
+    public IActionResult GetInquilino(string dni)
+    {
+        // Aquí, realiza la lógica para buscar el propietario por DNI
+        InquilinosRepository repo = new();
+        Inquilino inquilinoEncontrado = repo.GetInquilinoByDni(dni); // Tu lógica de búsqueda
+
+        if (inquilinoEncontrado != null)
+        {
+            // Retorna el objeto Propietario como JSON
+            return Ok(inquilinoEncontrado);
+        }
+        else
+        {
+            return NotFound();
+        }
     }
 
 }

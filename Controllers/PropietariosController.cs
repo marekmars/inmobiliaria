@@ -107,17 +107,30 @@ public class PropietariosController : Controller
         }
     }
 
-     public IActionResult Details(int id)
+    public IActionResult Details(int id)
     {
         PropietariosRepository repo = new();
         var propietario = repo.GetPropietarioById(id);
         return View(propietario);
     }
-
-
-    public IActionResult Privacy()
+    [HttpGet("api/Inmuebles/GetPropietario/{dni}")]
+    public IActionResult GetPropietario(string dni)
     {
-        return View();
+        // Aquí, realiza la lógica para buscar el propietario por DNI
+        PropietariosRepository repo = new();
+        Propietario propietarioEncontrado = repo.GetPropietarioByDni(dni); // Tu lógica de búsqueda
+
+        if (propietarioEncontrado != null)
+        {
+            // Retorna el objeto Propietario como JSON
+            return Ok(propietarioEncontrado);
+        }
+        else
+        {
+            return NotFound();
+        }
     }
+
+
 
 }

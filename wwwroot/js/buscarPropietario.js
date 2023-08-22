@@ -3,7 +3,8 @@ const btnRegistrar = document.getElementById("btnRegistrar");
 const dniInput = document.getElementById("busquedaDni");
 const cardProp = document.getElementById("cardProp");
 const idPropietario = document.getElementById("idPropietario");
-const form = document.getElementById("form");
+const formInputs = document.getElementById("formInputs");
+
 if (dniInput.value != "") {
   btnRegistrar.disabled = false;
 }
@@ -47,6 +48,7 @@ btnBuscar.addEventListener("click", (event) => {
             propietario.telefono;
           idPropietario.value = propietario.id;
           btnRegistrar.disabled = false;
+          formInputs.classList.remove("d-none");
         } else {
           return Swal.fire({
             icon: "error",
