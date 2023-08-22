@@ -61,11 +61,12 @@ btnBuscar.addEventListener("click", (event) => {
       .catch(function (error) {
         console.error("Error en la petición:", error);
       });
-  } else {
+  } 
+  else {
     console.log("El dni no es valido");
     return Swal.fire({
       icon: "error",
-      title: "Error en la petición, formato incompatible",
+      title: "Error en el formato del DNI, formato XX.XXX.XXX",
       showConfirmButton: false,
       timer: 2000,
     });

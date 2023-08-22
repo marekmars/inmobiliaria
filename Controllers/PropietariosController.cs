@@ -33,6 +33,8 @@ public class PropietariosController : Controller
         {
             PropietariosRepository repo = new();
             var res = repo.CreatePropietario(propietario);
+            /* Este bloque de código maneja los diferentes resultados posibles de la creación de un
+            nuevo propietario en el sistema. */
             if (res > 0)
             {
 
@@ -42,13 +44,28 @@ public class PropietariosController : Controller
             }
             else if (res == -1)
             {
-                TempData["AlertMessage"] = "No se pudo crear el propietario.";
+                TempData["AlertMessage"] = "No se pudo crear el propietario, Error en la base de datos.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Create");
+            }else if (res == -2)
+            {
+                TempData["AlertMessage"] = "No se pudo crear el propietario, Ingrese un numero telefonico valido.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Create");
+            }else if (res == -3)
+            {
+                TempData["AlertMessage"] = "No se pudo crear el propietario, Ingrese un email valido.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Create");
+            }else if (res == -4)
+            {
+                TempData["AlertMessage"] = "No se pudo crear el propietario, Ingrese un DNI valido.";
                 TempData["AlertType"] = "error";
                 return RedirectToAction("Create");
             }
             else
             {
-                TempData["AlertMessage"] = "Ya existe un propietario con ese DNI.";
+                TempData["AlertMessage"] = "No se pudo modificar el propietario, Ya existe un propietario con ese DNI.";
                 TempData["AlertType"] = "error";
                 return RedirectToAction("Create");
             }

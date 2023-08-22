@@ -81,7 +81,6 @@ public class PropietariosRepository
         }
         return propietario;
     }
-
     public Propietario GetPropietarioByDni(string dni)
     {
         Propietario propietario = new();
@@ -120,18 +119,21 @@ public class PropietariosRepository
 
         if (!EsNumeroTelefonoValido(propietario.Telefono))
         {
+            res=-2;
             return res;
         }
 
         // Verificar si el correo electrónico es válido
         if (!EsCorreoElectronicoValido(propietario.Correo))
         {
+            res=-3;
             return res;
         }
 
         // Verificar si el DNI es válido
         if (!EsDniValido(propietario.Dni))
         {
+            res=-4;
             return res;
         }
 
@@ -202,20 +204,23 @@ public class PropietariosRepository
     {
         var res = -1;
 
-        if (!EsNumeroTelefonoValido(propietario.Telefono))
+       if (!EsNumeroTelefonoValido(propietario.Telefono))
         {
+            res=-2;
             return res;
         }
 
         // Verificar si el correo electrónico es válido
         if (!EsCorreoElectronicoValido(propietario.Correo))
         {
+            res=-3;
             return res;
         }
 
         // Verificar si el DNI es válido
         if (!EsDniValido(propietario.Dni))
         {
+            res=-4;
             return res;
         }
 
