@@ -21,8 +21,8 @@
         <thead>
             <tr>
                                 
-                <th>Id Inquilino</th>
-                <th>Id Inmueble</th>
+                <th>Inquilino</th>
+                <th>Inmueble N°/Direccion</th>
                 <th>Fecha de Inicio</th>
                 <th>Fecha Fin</th>
                 <th>Estado</th>       
@@ -36,8 +36,8 @@
 
                     <tr>
 
-                        <td>@Contrato.Inquilino.Id</td>
-                        <td>@Contrato.Inmueble.Id</td>
+                        <td>@Contrato.Inquilino.ToString()</td>
+                        <td>@Contrato.Inmueble.Id - @Contrato.Inmueble.Direccion </td>
                         <td>@Contrato.FechaInicio.ToString("dd-MM-yyyy")</td>
                         <td>@Contrato.FechaFin.ToString("dd-MM-yyyy")</td>
                         <td>@(Contrato.Estado==true?"Activo":"Inactivo")</td>                     

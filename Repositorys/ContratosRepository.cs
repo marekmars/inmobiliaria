@@ -277,7 +277,7 @@ public class ContratosRepository
                               WHERE `idInmueble` = @idInmueble
                               AND `id` != @id
                               AND (@fechaInicio BETWEEN `fechaInicio` AND `fechaFin`
-                                   OR @fechaFin BETWEEN `fechaInicio` AND `fechaFin`)";
+                                   OR @fechaFin BETWEEN `fechaInicio` AND `fechaFin`) AND `estado` = 1";
 
                 using (MySqlCommand checkCommand = new MySqlCommand(checkQuery, connection))
                 {

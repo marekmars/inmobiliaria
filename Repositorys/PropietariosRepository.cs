@@ -117,11 +117,7 @@ public class PropietariosRepository
     {
         var res = -1;
 
-        if (!EsNumeroTelefonoValido(propietario.Telefono))
-        {
-            res=-2;
-            return res;
-        }
+       
 
         // Verificar si el correo electrónico es válido
         if (!EsCorreoElectronicoValido(propietario.Correo))
@@ -204,11 +200,7 @@ public class PropietariosRepository
     {
         var res = -1;
 
-       if (!EsNumeroTelefonoValido(propietario.Telefono))
-        {
-            res=-2;
-            return res;
-        }
+       
 
         // Verificar si el correo electrónico es válido
         if (!EsCorreoElectronicoValido(propietario.Correo))
@@ -263,12 +255,7 @@ public class PropietariosRepository
     }
 
 
-    private bool EsNumeroTelefonoValido(string telefono)
-    {
-
-        string patron = @"^\+\d{2} \d{2,3}-\d{6,7}$";
-        return Regex.IsMatch(telefono, patron);
-    }
+  
 
     private bool EsCorreoElectronicoValido(string correo)
     {
