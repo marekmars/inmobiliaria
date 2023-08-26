@@ -117,7 +117,13 @@
             </div>
             <input id="idInmueble" class="form-control" type="hidden" name="IdInmueble" required>
         </div>
+
         <div class="container d-none d-flex flex-column gap-3" id="formInputs">
+              <div id="fechaInicioContainer" class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
+                 <input id="fechaInicio"  class="form-control" type="number" name="MontoMensual" required>
+                 <label for="MontoMensual" class="ms-2">Monto Mensual $</label>
+             </div>
+
              <div id="fechaInicioContainer"class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center ">
               <input id="fechaInicio"  class="form-control" type="date" name="FechaInicio" placeholder="sad" required onchange="document.getElementById('fechaFin').min = document.getElementById('fechaInicio').value">
               <label for="FechaInicio" class="ms-2">Fecha de Inicio</label>

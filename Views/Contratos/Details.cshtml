@@ -25,6 +25,12 @@
             <label for="fechaFin" class="ms-2">Fecha de Finalizacion</label>
           </div>
           <div
+            class="d-flex gap-5 form-floating justify-content align-items-center mx-auto text- *center">
+            <input value="$@Model.MontoMensual" class="form-control input-mid"
+            type="text" name="montoMensual" placeholder="asd" disabled>
+            <label for="montoMensual" class="ms-2">Monto Mensual</label>
+          </div>
+          <div
             class="d-flex gap-5 form-floating justify-content align-items-center mx-auto  text- *center">
             <input value= @(Model.Estado ? "Activo" : "Inactivo") class="form-control input-bot"
             type="text" name="estado" placeholder="asd" disabled>

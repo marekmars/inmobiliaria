@@ -120,6 +120,11 @@
         </div>
 
         <div id="fechaInicioContainer" class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
+            <input id="fechaInicio" value="@Model.MontoMensual" class="form-control" type="number" name="MontoMensual" required>
+            <label for="MontoMensual" class="ms-2">Monto Mensual $</label>
+        </div>
+
+        <div id="fechaInicioContainer" class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
             <input id="fechaInicio" value="@Model.FechaInicio.ToString("yyyy-MM-dd")" class="form-control" type="date" name="FechaInicio" onchange="document.getElementById('fechaFin').min = document.getElementById('fechaInicio').value" required>
             <label for="FechaInicio" class="ms-2">Fecha de Inicio</label>
         </div>

@@ -22,7 +22,7 @@ public class ContratosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT `id`, `idInquilino`, `idInmueble`, `fechaInicio`, `fechaFin`, `estado` FROM `contratos`";
+            string query = "SELECT `id`, `idInquilino`, `idInmueble`,`montoMensual`, `fechaInicio`, `fechaFin`, `estado` FROM `contratos`";
             InquilinosRepository inquilinosRepo = new();
             InmueblesRepository inmueblesRepo = new();
             using (MySqlCommand command = new(query, connection))
@@ -41,6 +41,7 @@ public class ContratosRepository
                             Inquilino = inquilino,
                             IdInmueble = inmueble.Id,
                             Inmueble = inmueble,
+                            MontoMensual = reader.GetDouble("montoMensual"),
                             FechaInicio = reader.GetDateTime("fechaInicio"),
                             FechaFin = reader.GetDateTime("fechaFin"),
                             Estado = reader.GetBoolean("estado"),
@@ -63,7 +64,7 @@ public class ContratosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = @"SELECT `id`, `idInquilino`, `idInmueble`, `fechaInicio`, `fechaFin`, `estado` FROM `contratos` WHERE id=@id";
+            string query = @"SELECT `id`, `idInquilino`, `idInmueble`, `fechaInicio`, `fechaFin`,`montoMensual`, `estado` FROM `contratos` WHERE id=@id";
             InquilinosRepository inquilinosRepo = new();
             InmueblesRepository inmueblesRepo = new();
 
@@ -84,6 +85,7 @@ public class ContratosRepository
                             Inquilino = inquilino,
                             IdInmueble = inmueble.Id,
                             Inmueble = inmueble,
+                            MontoMensual = reader.GetDouble("montoMensual"),
                             FechaInicio = reader.GetDateTime("fechaInicio"),
                             FechaFin = reader.GetDateTime("fechaFin"),
                             Estado = reader.GetBoolean("estado"),
@@ -137,11 +139,6 @@ public class ContratosRepository
     {
         var res = -1;
     
-        Console.WriteLine($"idInquilino {contrato.IdInquilino}");
-        Console.WriteLine($"idInmueble {contrato.IdInmueble}");
-        Console.WriteLine($"FechaInicio {contrato.FechaInicio}");
-        Console.WriteLine($"FechaFin {contrato.FechaFin}");
-        Console.WriteLine($"Estado {contrato.Estado}");
 
         bool disponibilidad = VerificarDisponibilidad(contrato);
 
@@ -156,8 +153,8 @@ public class ContratosRepository
                 {
                     using (MySqlConnection connection = new MySqlConnection(connectionString))
                     {
-                        string query = @"INSERT INTO `contratos`(`idInquilino`, `idInmueble`, `fechaInicio`, `fechaFin`, `estado`)
-                     VALUES (@idInquilino, @idInmueble, @fechaInicio, @fechaFin, @estado);
+                        string query = @"INSERT INTO `contratos`(`idInquilino`, `idInmueble`,`montoMensual`, `fechaInicio`, `fechaFin`, `estado`)
+                     VALUES (@idInquilino, @idInmueble,@montoMensual, @fechaInicio, @fechaFin, @estado);
                      SELECT LAST_INSERT_ID()";
 
                         using (MySqlCommand command = new(query, connection))
@@ -165,6 +162,7 @@ public class ContratosRepository
                             connection.Open();
                             command.Parameters.AddWithValue("@idInquilino", contrato.IdInquilino);
                             command.Parameters.AddWithValue("@idInmueble", contrato.IdInmueble);
+                            command.Parameters.AddWithValue("@montoMensual", contrato.MontoMensual);
                             command.Parameters.AddWithValue("@fechaInicio", contrato.FechaInicio);
                             command.Parameters.AddWithValue("@fechaFin", contrato.FechaFin);
                             command.Parameters.AddWithValue("@estado", contrato.Estado);
@@ -220,24 +218,18 @@ public class ContratosRepository
     public int UpdateContrato(Contrato contrato)
     {
         var res = -1;
-        Console.WriteLine($"Id {contrato.Id}");
-        Console.WriteLine($"idInquilino {contrato.IdInquilino}");
-        Console.WriteLine($"idInmueble {contrato.IdInmueble}");
-        Console.WriteLine($"FechaInicio {contrato.FechaInicio}");
-        Console.WriteLine($"FechaFin {contrato.FechaFin}");
-        Console.WriteLine($"Estado {contrato.Estado}");
-
+ 
         bool disponibilidad = VerificarDisponibilidad(contrato);
         
 
-        if (contrato.IdInquilino != 0 && contrato.IdInmueble != 0 && contrato.FechaFin != DateTime.MinValue &&
+        if (contrato.IdInquilino != 0 && contrato.IdInmueble != 0&& contrato.MontoMensual != 0 && contrato.FechaFin != DateTime.MinValue &&
             contrato.FechaInicio != DateTime.MinValue)
         {
             if (!disponibilidad)
             {
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
-                    string query = @"UPDATE `contratos` SET `fechaInicio` = @fechaInicio,`fechaFin` = @fechaFin,`estado` = @estado,
+                    string query = @"UPDATE `contratos` SET `fechaInicio` = @fechaInicio,`fechaFin` = @fechaFin,`montoMensual`= @montoMensual,`estado` = @estado,
                    `idInquilino` = @idInquilino , `idInmueble` = @idInmueble WHERE `id`= @Id" ;
 
                     using (MySqlCommand command = new(query, connection))
@@ -246,6 +238,7 @@ public class ContratosRepository
                         command.Parameters.AddWithValue("@Id", contrato.Id);
                         command.Parameters.AddWithValue("@idInquilino", contrato.IdInquilino);
                         command.Parameters.AddWithValue("@idInmueble", contrato.IdInmueble);
+                        command.Parameters.AddWithValue("@montoMensual", contrato.MontoMensual);
                         command.Parameters.AddWithValue("@fechaInicio", contrato.FechaInicio);
                         command.Parameters.AddWithValue("@fechaFin", contrato.FechaFin);
                         command.Parameters.AddWithValue("@estado", contrato.Estado);
