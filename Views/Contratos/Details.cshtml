@@ -164,18 +164,34 @@
             <label for="longitud" class="ms-2">Longitud</label>
           </div>
 
+          
+
           <div
             class="d-flex gap-5 form-floating justify-content align-items-center mx-auto  text-center">
             <input
               id="precio"
               value="$ @Model.Inmueble.Precio"
-              class="form-control input-bot"
+              class="form-control input-mid"
               type="text"
               name="Precio"
               step="any"
               disabled />
             <label for="precio" class="ms-2">Precio</label>
           </div>
+
+            <div
+            class="d-flex gap-5 form-floating justify-content align-items-center mx-auto  text-center">
+            <input
+              id="precio"
+              value="@Model.Inmueble.Propietario.ToString()"
+              class="form-control input-bot"
+              type="text"
+              name="Precio"
+              step="any"
+              disabled />
+            <label for="precio" class="ms-2">Propietario</label>
+          </div>
+
         </div>
       </div>
     </div>
