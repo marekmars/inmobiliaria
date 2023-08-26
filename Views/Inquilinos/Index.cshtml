@@ -42,15 +42,15 @@
                         <td>@inquilino.Correo</td>
                         <td class="d-flex gap-2 justify-content-center align-items-center" >
                           <form asp-action="Delete" asp-route-id="@inquilino.Id" onsubmit="return confirmarEliminacion(event)">
-                              <button type="submit" class="btn btn-danger w-75 h-75 d-flex justify-content-center align-items-center">
+                              <button type="submit" class="btn btn-outline-danger w-75 h-75 d-flex justify-content-center align-items-center">
                                   <i class="fa-solid fa-trash"></i>  
                               </button>
                           </form>
                          <div >
-                           <a href="/Inquilinos/Update/@inquilino.Id" class="btn btn-primary w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-pen-to-square" style="cursor:pointer;"></i> </a>
+                           <a href="/Inquilinos/Update/@inquilino.Id" class="btn btn-outline-primary w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-pen-to-square" style="cursor:pointer;"></i> </a>
                          </div>
                          <div >
-                           <a href="/Inquilinos/Details/@inquilino.Id" class="btn btn-info w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-eye style="cursor:pointer;""></i> </a>
+                           <a href="/Inquilinos/Details/@inquilino.Id" class="btn btn-outline-info w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-eye style="cursor:pointer;""></i> </a>
                          </div>
                         </td>
                          
