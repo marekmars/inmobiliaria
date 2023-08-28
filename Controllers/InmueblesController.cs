@@ -37,6 +37,7 @@ public class InmueblesController : Controller
         try
         {
             InmueblesRepository repo = new();
+           
             var res = repo.CreateInmueble(inmueble);
             if (res > 0)
             {

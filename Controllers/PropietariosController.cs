@@ -26,59 +26,6 @@ public class PropietariosController : Controller
 
         return View();
     }
-    [HttpPost]
-    // public IActionResult Create(Propietario propietario)
-    // {
-
-    //     try
-    //     {
-    //         PropietariosRepository repo = new();
-    //         var res = repo.CreatePropietario(propietario);
-    //         /* Este bloque de código maneja los diferentes resultados posibles de la creación de un
-    //         nuevo propietario en el sistema. */
-    //         if (res > 0)
-    //         {
-    //             TempData["AlertMessage"] = "Propietario creado correctamente.";
-    //             TempData["AlertType"] = "success";
-    //             return RedirectToAction("Index");
-    //         }
-    //         else if (res == -1)
-    //         {
-    //             TempData["AlertMessage"] = "No se pudo crear el propietario, Error en la base de datos.";
-    //             TempData["AlertType"] = "error";
-    //             return RedirectToAction("Create");
-    //         }
-    //         else if (res == -2)
-    //         {
-    //             TempData["AlertMessage"] = "No se pudo crear el propietario, Ingrese un numero telefonico valido.";
-    //             TempData["AlertType"] = "error";
-    //             return RedirectToAction("Create");
-    //         }
-    //         else if (res == -3)
-    //         {
-    //             TempData["AlertMessage"] = "No se pudo crear el propietario, Ingrese un email valido.";
-    //             TempData["AlertType"] = "error";
-    //             return RedirectToAction("Create");
-    //         }
-    //         else if (res == -4)
-    //         {
-    //             TempData["AlertMessage"] = "No se pudo crear el propietario, Ingrese un DNI valido.";
-    //             TempData["AlertType"] = "error";
-    //             return RedirectToAction("Create");
-    //         }
-    //         else
-    //         {
-    //             TempData["AlertMessage"] = "No se pudo modificar el propietario, Ya existe un propietario con ese DNI.";
-    //             TempData["AlertType"] = "error";
-    //             return RedirectToAction("Create");
-    //         }
-    //     }
-    //     catch (System.Exception)
-    //     {
-    //         throw;
-    //     }
-
-    // }
 
     [HttpPost]
     public IActionResult Create(Propietario propietario)
@@ -93,6 +40,8 @@ public class PropietariosController : Controller
             var enumUso = repo2.GetEnumsTipes("uso");
             ViewBag.enumTipo = enumTipo;
             ViewBag.enumUso = enumUso;
+            
+          
 
             string returnUrl = Request.Headers["Referer"].ToString();
             Uri refererUri = new Uri(returnUrl);
@@ -103,14 +52,14 @@ public class PropietariosController : Controller
 
                 TempData["AlertMessage"] = "Propietario creado correctamente.";
                 TempData["AlertType"] = "success";
-                
+
 
                 if (relativePath == "/Propietarios/Create")
                 {
-                   
+
                     return Redirect("index");
                 }
-                
+
 
 
             }
@@ -206,7 +155,7 @@ public class PropietariosController : Controller
         var propietario = repo.GetPropietarioById(id);
         return View(propietario);
     }
-    
+
     [HttpGet("api/Propietarios/GetPropietario/{dni}")]
     public IActionResult GetPropietario(string dni)
     {
@@ -224,7 +173,7 @@ public class PropietariosController : Controller
             return NotFound();
         }
     }
-    [HttpGet("api/Inmuebles/GetPropietarios")]
+    [HttpGet("api/Propietarios/GetPropietarios")]
     public IActionResult GetAllPropietarios()
     {
         // Aquí, realiza la lógica para obtener todos los propietarios

@@ -11,6 +11,7 @@ public class Inmueble
     public int Id { get; set; }
     [Required]
     public int IdPropietario { get; set; }
+    [ForeignKey(nameof(IdPropietario))]
     public Propietario? Propietario { get; set; }
     [Required]
     public string Direccion { get; set; }="";

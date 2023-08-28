@@ -42,19 +42,22 @@
                         <td>$@Contrato.MontoMensual</td>
                         <td>@Contrato.FechaInicio.ToString("dd-MM-yyyy")</td>
                         <td>@Contrato.FechaFin.ToString("dd-MM-yyyy")</td>
-                        <td>@(Contrato.Estado==true?"Activo":"Inactivo")</td>                     
+                        <td><i class="fa-solid fa-circle @(Contrato.Estado==true?"text-success":"text-danger")"></i></td>                     
                         
                         <td class="d-flex gap-2 justify-content-center align-items-center" >
                           <form asp-action="Delete" asp-route-id="@Contrato.Id" onsubmit="return confirmarEliminacion(event)">
-                              <button type="submit" class="btn btn-outline-danger w-75 h-75 d-flex justify-content-center align-items-center">
+                              <button type="submit" class="btn btn-outline-danger w-75 h-75 d-flex justify-content-center align-items-center" title="Eliminar">
                                   <i class="fa-solid fa-trash"></i>  
                               </button>
                           </form>
                          <div >
-                           <a href="/Contratos/Update/@Contrato.Id" class="btn btn-outline-primary w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-pen-to-square" style="cursor:pointer;"></i> </a>
+                           <a href="/Contratos/Update/@Contrato.Id" class="btn btn-outline-primary w-75  d-flex justify-content-center align-items-center" title="Modificar"> <i class="fa-solid fa-pen-to-square" style="cursor:pointer;"></i> </a>
                          </div>
                          <div >
-                           <a href="/Contratos/Details/@Contrato.Id" class="btn btn-outline-info w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-eye style="cursor:pointer;""></i> </a>
+                           <a href="/Contratos/Details/@Contrato.Id" class="btn btn-outline-info w-75  d-flex justify-content-center align-items-center" title="Detalles"> <i class="fa-solid fa-eye style="cursor:pointer;""></i> </a>
+                         </div>
+                         <div >
+                           <a href="/Pagos/Index?IdContrato=@Contrato.Id" class="btn btn-outline-warning w-75  d-flex justify-content-center align-items-center" title="Pagos"> <i class="fa-solid fa-file-invoice-dollar" style="cursor:pointer;"></i></a>
                          </div>
                         </td>
                          

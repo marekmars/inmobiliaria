@@ -112,5 +112,57 @@ public class ContratosController : Controller
         return View(contrato);
     }
 
+ [HttpGet("api/Contratos/GetContratos")]
+    public IActionResult GetAllContratos()
+    {
+        // Aquí, realiza la lógica para obtener todos los contratos
+        ContratosRepository repo = new();
+        List<Contrato> contrato = repo.GetAllContratos(); // Tu lógica para obtener todos los contratos
+
+        if (contrato.Count > 0)
+        {
+            // Retorna la lista de contrats como JSON
+            return Ok(contrato);
+        }
+        else
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpGet("Contratos/FiltrarContratos")]
+    public IActionResult FiltrarContratos([FromQuery] string searchTerm)
+    {
+
+        IActionResult result = GetAllContratos(); // Obtener el resultado
+
+        if (result is OkObjectResult okObjectResult)
+        {
+            var contratosResponse = okObjectResult.Value; // Obtener el contenido del resultado
+            if (contratosResponse is List<Contrato> contratos)
+            {
+                if (string.IsNullOrEmpty(searchTerm))
+                {
+                    return Json(contratos); 
+                }
+
+            
+                var contratosFiltrados = contratos.Where(c =>
+                    c.Inquilino.Nombre.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase) ||
+                    c.Inquilino.Apellido.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase) ||
+                    c.Inquilino.Dni.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase)||
+                    c.Inmueble.Direccion.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase)||
+                    c.MontoMensual.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+
+
+                ).ToList();
+
+                return Json(contratosFiltrados);
+            }
+        }
+
+        // Si algo salió mal o el tipo no coincide, regresa un error u otra respuesta
+        return BadRequest("Error al obtener los contratos");
+    }
 
 }

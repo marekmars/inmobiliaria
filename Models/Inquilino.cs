@@ -7,6 +7,7 @@ namespace Inmobiliaria.Models;
 [Table("inmuebles")]
 public class Inquilino : Persona
 {
+    
      [Required]
       [Key]
     public int Id { get; set; }
