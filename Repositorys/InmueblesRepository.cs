@@ -22,7 +22,7 @@ public class InmueblesRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT id, idPropietario, direccion, uso, tipo, cantAmbientes, latitud, longitud, precio FROM inmuebles";
+            string query = "SELECT id, idPropietario, direccion, uso, tipo, cantAmbientes, latitud, longitud, precio,estado FROM inmuebles";
             PropietariosRepository propietariosRepo = new();
             using (MySqlCommand command = new(query, connection))
             {
@@ -42,7 +42,8 @@ public class InmueblesRepository
                             CantAmbientes = reader.GetInt32("cantAmbientes"),
                             Latitud = reader.GetDouble("latitud"),
                             Longitud = reader.GetDouble("longitud"),
-                            Precio = reader.GetDouble("precio")
+                            Precio = reader.GetDouble("precio"),
+                            Estado = reader.GetBoolean("estado")
                         };
 
                         inmuebles.Add(inmueble);
@@ -61,7 +62,7 @@ public class InmueblesRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT id, idPropietario, direccion, uso, tipo, cantAmbientes, latitud, longitud, precio FROM inmuebles WHERE id=@id";
+            string query = "SELECT id, idPropietario, direccion, uso, tipo, cantAmbientes, latitud, longitud, precio,estado FROM inmuebles WHERE id=@id";
             PropietariosRepository propietariosRepo = new();
             using (MySqlCommand command = new(query, connection))
             {
@@ -82,7 +83,8 @@ public class InmueblesRepository
                             CantAmbientes = reader.GetInt32("cantAmbientes"),
                             Latitud = reader.GetDouble("latitud"),
                             Longitud = reader.GetDouble("longitud"),
-                            Precio = reader.GetDouble("precio")
+                            Precio = reader.GetDouble("precio"),
+                            Estado = reader.GetBoolean("estado")
                         };
 
 
@@ -236,6 +238,31 @@ public class InmueblesRepository
 
     }
 
+    public int UpdateInmuebleEstado(Inmueble inmueble)
+    {
+        var res = -1;
+
+
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            string query = @"UPDATE `inmuebles`SET `estado` = @Estado WHERE `id` = @Id;";
+
+            using (MySqlCommand command = new(query, connection))
+            {
+                connection.Open();
+             
+                command.Parameters.AddWithValue("@Id", inmueble.Id);
+                command.Parameters.AddWithValue("@Estado", inmueble.Estado);
+                res = command.ExecuteNonQuery();
+                connection.Close();
+            }
+
+
+        }
+
+        return res;
+
+    }
 
 
 

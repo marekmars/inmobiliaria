@@ -60,6 +60,12 @@
                          <div >
                            <a href="/Inmuebles/Details/@Inmueble.Id" class="btn btn-outline-info w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-eye style="cursor:pointer;""></i> </a>
                          </div>
+                         <div >
+                            <form asp-action="PausarPlay" asp-route-id="@Inmueble.Id">
+                                <button class="btn  w-75 @(Inmueble.Estado==true?"btn-outline-success":"btn-outline-danger") d-flex justify-content-center align-items-center"><i class="fa-solid @(Inmueble.Estado==true?"fa-circle-pause":"fa-circle-play")" style="cursor:pointer;"></i></button>
+                            </form>
+   
+                         </div>
                         </td>
                          
                     </tr>

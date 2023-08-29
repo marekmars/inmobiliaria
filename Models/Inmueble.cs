@@ -27,4 +27,6 @@ public class Inmueble
     public double Longitud { get; set; }
     [Required]
     public double Precio { get; set; }
+    [Required]
+    public bool Estado { get; set; }=true;
 }

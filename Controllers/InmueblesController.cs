@@ -37,7 +37,7 @@ public class InmueblesController : Controller
         try
         {
             InmueblesRepository repo = new();
-           
+
             var res = repo.CreateInmueble(inmueble);
             if (res > 0)
             {
@@ -53,6 +53,38 @@ public class InmueblesController : Controller
                 return RedirectToAction("Create");
             }
 
+        }
+        catch (System.Exception)
+        {
+            throw;
+        }
+
+    }
+    [HttpPost]
+    public IActionResult PausarPlay(int id)
+    {
+        try
+        {
+
+            InmueblesRepository repo = new();
+            Inmueble inmueble = repo.GetInmuebleById(id);
+            Console.WriteLine("ESTADO INMUEBLE: " + inmueble.Estado);
+
+            if (inmueble.Estado)
+            {
+                inmueble.Estado = false;
+                TempData["AlertMessage"] = "El Inmueble se pauso correctamente.";
+                TempData["AlertType"] = "success";
+            }
+            else
+            {
+                inmueble.Estado = true;
+                TempData["AlertMessage"] = "El Inmueble se encuentra disponible nuevamente.";
+                TempData["AlertType"] = "success";
+            }
+            repo.UpdateInmuebleEstado(inmueble);
+
+            return RedirectToAction("index");
         }
         catch (System.Exception)
         {
@@ -154,7 +186,8 @@ public class InmueblesController : Controller
     public IActionResult FiltrarInmuebles([FromQuery] string searchTerm)
     {
         Console.WriteLine("ENTRO");
-        IActionResult result = GetAllInmuebles(); // Obtener el resultado
+        IActionResult result = GetAllInmuebles();
+        // Obtener el resultado
 
         if (result is OkObjectResult okObjectResult)
         {
@@ -163,27 +196,28 @@ public class InmueblesController : Controller
             {
                 if (string.IsNullOrEmpty(searchTerm))
                 {
-                    return Json(inmuebles); // Retorna todos los propietarios si no hay término de búsqueda
+                    var inmueblesActivos = inmuebles.Where(i => i.Estado == true).ToList();
+                    return Json(inmueblesActivos); // Retorna los inmuebles activos si no hay término de búsqueda
                 }
 
-                // Filtra los propietarios por el término de búsqueda (puedes personalizar la lógica según tus necesidades)
-                var propietariosFiltrados = inmuebles.Where(p =>
-                    p.Propietario.Nombre.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase) ||
-                    p.Propietario.Apellido.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase) ||
-                    p.Propietario.Dni.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase) ||
-                    p.Direccion.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase) ||
-                     p.Tipo.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase)
-
-
+                // Filtra los inmuebles activos por el término de búsqueda (puedes personalizar la lógica según tus necesidades)
+                var inmueblesFiltrados = inmuebles.Where(i =>
+                    i.Estado == true &&
+                    (i.Propietario.Nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                     i.Propietario.Apellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                     i.Propietario.Dni.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                     i.Direccion.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                     i.Tipo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                 ).ToList();
 
-                return Json(propietariosFiltrados);
+                return Json(inmueblesFiltrados);
             }
         }
 
         // Si algo salió mal o el tipo no coincide, regresa un error u otra respuesta
-        return BadRequest("Error al obtener los propietarios");
+        return BadRequest("Error al obtener los inmuebles");
     }
+
 
 
 }

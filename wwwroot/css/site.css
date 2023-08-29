@@ -30,6 +30,11 @@ html {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+.swal2-radio{
+  background-color: #19191a !important;
+  color: aliceblue !important;
+}
+
 
 @media (min-width: 768px) {
   html {

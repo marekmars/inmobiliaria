@@ -40,13 +40,15 @@ public class ContratosController : Controller
                 TempData["AlertType"] = "success";
                 return RedirectToAction("Index");
             }
-            else if(res == -1)
+            else if (res == -1)
             {
                 TempData["AlertMessage"] = "No se pudo crear el Contrato, debido a un error en los datos ingresados";
                 TempData["AlertType"] = "error";
                 return RedirectToAction("Create");
-            }else{
-                 TempData["AlertMessage"] = "No se pudo crear el Contrato, Ya existe uno para ese inmueble en la fecha seleccionada.";
+            }
+            else
+            {
+                TempData["AlertMessage"] = "No se pudo crear el Contrato, Ya existe uno para ese inmueble en la fecha seleccionada.";
                 TempData["AlertType"] = "error";
                 return RedirectToAction("Create");
             }
@@ -60,19 +62,73 @@ public class ContratosController : Controller
     }
 
     [HttpPost]
-    public IActionResult Delete(int id)
+    public IActionResult Delete(int id, string resignacion)
     {
         try
         {
             ContratosRepository repo = new();
-            repo.DeleteContrato(id);
+            InquilinosRepository repoInquilino = new();
+            PagosRepository repoPago = new();
+
+            if (string.IsNullOrWhiteSpace(resignacion))
+            {
+                var pagos = repoPago.GetPagoByContratoId(id);
+                foreach (var pago in pagos)
+                {
+                    repoPago.DeletePago(pago.Id);
+                }
+
+                repo.DeleteContrato(id);
+            }
+            else
+            {
+                Contrato contrato = repo.GetContratoById(id);
+                if (contrato != null)
+                {
+                    // Calcular la multa
+                    DateTime fechaFin = contrato.FechaFin;
+                    DateTime fechaHoy = DateTime.Now;
+                    TimeSpan tiempoTranscurrido = fechaHoy - fechaFin;
+                    int mesesTranscurridos = Math.Abs(tiempoTranscurrido.Days / 30);
+                    double multa;
+                    Console.WriteLine("tiempoTranscurrido: " + tiempoTranscurrido);
+                    Console.WriteLine("MESES: " + mesesTranscurridos);
+                    TempData["Inquilino"] = repoInquilino.GetInquilinoById(contrato.IdInquilino).ToString();
+                    if (mesesTranscurridos >= 2)
+                    {
+                        multa = contrato.MontoMensual * 2;
+                        TempData["Multa"] ="$"+ multa;
+
+                    }
+                    else
+                    {
+                        multa = contrato.MontoMensual;
+                        TempData["Multa"] = "$"+multa;
+                    }
+
+                    TempData["AlertMessage"] = $"Se resigno el contrato, el cliente debera abonar una multa de {TempData["Multa"]}";
+                    TempData["AlertType"] = "warning";
+                    
+
+                    // contrato.Estado = false;
+                    // contrato.FechaFin = fechaHoy;
+                    // repo.UpdateContrato(contrato);
+                }
+                else
+                {
+                    // Lógica para manejar el caso donde no se encuentra el contrato
+                }
+            }
+
             return RedirectToAction("Index");
         }
-        catch (System.Exception)
+        catch (Exception ex)
         {
-            throw;
+            // Manejar la excepción de manera adecuada, como registrarla o mostrar un mensaje de error al usuario
+            return RedirectToAction($"Error: {ex.Message}");
         }
     }
+
     public IActionResult Update(int id)
     {
         ContratosRepository repo = new();
@@ -86,22 +142,24 @@ public class ContratosController : Controller
         ContratosRepository repo = new();
         int res = repo.UpdateContrato(contrato);
         if (res > 0)
-            {
+        {
 
-                TempData["AlertMessage"] = "Contrato modificado correctamente.";
-                TempData["AlertType"] = "success";
-                return RedirectToAction("Index");
-            }
-            else if(res == -1)
-            {
-                TempData["AlertMessage"] = "No se pudo modificar el Contrato, debido a un error en los datos ingresados";
-                TempData["AlertType"] = "error";
-                return RedirectToAction("Update");
-            }else{
-                 TempData["AlertMessage"] = "No se pudo modificar el Contrato, Ya existe uno para ese inmueble en la fecha seleccionada.";
-                TempData["AlertType"] = "error";
-                return RedirectToAction("Update");
-            }
+            TempData["AlertMessage"] = "Contrato modificado correctamente.";
+            TempData["AlertType"] = "success";
+            return RedirectToAction("Index");
+        }
+        else if (res == -1)
+        {
+            TempData["AlertMessage"] = "No se pudo modificar el Contrato, debido a un error en los datos ingresados";
+            TempData["AlertType"] = "error";
+            return RedirectToAction("Update");
+        }
+        else
+        {
+            TempData["AlertMessage"] = "No se pudo modificar el Contrato, Ya existe uno para ese inmueble en la fecha seleccionada.";
+            TempData["AlertType"] = "error";
+            return RedirectToAction("Update");
+        }
 
     }
 
@@ -112,7 +170,7 @@ public class ContratosController : Controller
         return View(contrato);
     }
 
- [HttpGet("api/Contratos/GetContratos")]
+    [HttpGet("api/Contratos/GetContratos")]
     public IActionResult GetAllContratos()
     {
         // Aquí, realiza la lógica para obtener todos los contratos
@@ -143,15 +201,15 @@ public class ContratosController : Controller
             {
                 if (string.IsNullOrEmpty(searchTerm))
                 {
-                    return Json(contratos); 
+                    return Json(contratos);
                 }
 
-            
+
                 var contratosFiltrados = contratos.Where(c =>
                     c.Inquilino.Nombre.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase) ||
                     c.Inquilino.Apellido.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase) ||
-                    c.Inquilino.Dni.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase)||
-                    c.Inmueble.Direccion.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase)||
+                    c.Inquilino.Dni.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase) ||
+                    c.Inmueble.Direccion.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase) ||
                     c.MontoMensual.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
 
 
