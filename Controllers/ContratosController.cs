@@ -98,7 +98,6 @@ public class ContratosController : Controller
                     {
                         multa = contrato.MontoMensual * 2;
                         TempData["Multa"] ="$"+ multa;
-
                     }
                     else
                     {
@@ -110,9 +109,9 @@ public class ContratosController : Controller
                     TempData["AlertType"] = "warning";
                     
 
-                    // contrato.Estado = false;
-                    // contrato.FechaFin = fechaHoy;
-                    // repo.UpdateContrato(contrato);
+                    contrato.Estado = false;
+                    contrato.FechaFin = fechaHoy;
+                    repo.UpdateContrato(contrato);
                 }
                 else
                 {
