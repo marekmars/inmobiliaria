@@ -175,6 +175,7 @@ public class InmueblesRepository
         return res;
 
     }
+    
 
     public int DeleteInmueble(int id)
     {

@@ -41,16 +41,20 @@
                     <td>@propietario.Telefono</td>
                     <td>@propietario.Correo</td>
                     <td class="d-flex gap-2 justify-content-center align-items-center" >
-                          <form asp-action="Delete" asp-route-id="@propietario.Id" onsubmit="return confirmarEliminacion(event)">
-                              <button type="submit" class="btn btn-outline-danger w-75 h-75 d-flex justify-content-center align-items-center">
-                                  <i class="fa-solid fa-trash"></i>  
-                              </button>
-                          </form>
+                         @if(User.IsInRole("Administrador"))
+                                   {
+                                    <form asp-action="Delete" asp-route-id="@propietario.Id" onsubmit="return confirmarEliminacion(event)">
+                                        <button type="submit" class="btn btn-outline-danger w-75 h-75 d-flex justify-content-center align-items-center">
+                                            <i class="fa-solid fa-trash"></i>  
+                                        </button>
+                                    </form>
+                                   }
+                          
                          <div >
-                           <a href="Propietarios/Update/@propietario.Id" class="btn btn-outline-primary w-75  d-flex justify-content-center align-items-center"> <i class="fa-regular fa-pen-to-square" style="cursor:pointer;"></i> </a>
+                           <a asp-action="Update" asp-controller="Propietarios" asp-route-id="@propietario.Id" class="btn btn-outline-primary w-75  d-flex justify-content-center align-items-center"> <i class="fa-regular fa-pen-to-square" style="cursor:pointer;"></i> </a>
                          </div>
                           <div >
-                           <a href="/Propietarios/Details/@propietario.Id" class="btn btn-outline-info w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-eye style="cursor:pointer;""></i> </a>
+                           <a asp-action="Details" asp-controller="Propietarios" asp-route-id="@propietario.Id" class="btn btn-outline-info w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-eye style="cursor:pointer;""></i> </a>
                          </div>
                     </td>
                 </tr>

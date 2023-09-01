@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Inmobiliaria.Models;
-
+using Microsoft.AspNetCore.Authorization;
 namespace Inmobiliaria.Controllers;
-
+[Authorize]
 public class PropietariosController : Controller
 {
     private readonly ILogger<PropietariosController> _logger;
@@ -103,6 +103,7 @@ public class PropietariosController : Controller
     }
 
     [HttpPost]
+    [Authorize(Policy="Administrador")]
     public IActionResult Delete(int id)
     {
         try

@@ -4,7 +4,7 @@ using Inmobiliaria.Models;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient; // Asegúrate de tener la referencia correcta a MySql.Data
 using System.Text.RegularExpressions;
-
+using Microsoft.Extensions.ObjectPool;
 
 namespace Inmobiliaria.Models;
 public class PagosRepository
@@ -64,7 +64,7 @@ public class PagosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = @"SELECT `id`, `idContrato`, `fechaPago`, `importe` FROM `pagos` WHERE `id` = @id";
+            string query = @"SELECT `id`,`nroPago`, `idContrato`, `fechaPago`, `importe` FROM `pagos` WHERE `id` = @id";
             using (MySqlCommand command = new(query, connection))
             {
                 command.Parameters.AddWithValue("@id", id);
@@ -75,6 +75,7 @@ public class PagosRepository
                         pago = new()
                         {
                             Id = reader.GetInt32("id"),
+                            NroPago = reader.GetInt32("nroPago"),
                             IdContrato = reader.GetInt32("idContrato"),
                             FechaPago = reader.GetDateTime("fechaPago"),
                             Importe = reader.GetDouble("importe"),
@@ -94,7 +95,7 @@ public class PagosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = @"SELECT `id`, `idContrato`, `fechaPago`, `importe` FROM `pagos` WHERE `idContrato` = @idContrato";
+            string query = @"SELECT `id`,`nroPago`, `idContrato`, `fechaPago`, `importe` FROM `pagos` WHERE `idContrato` = @idContrato";
             ContratosRepository repo = new();
 
             using (MySqlCommand command = new(query, connection))
@@ -109,12 +110,14 @@ public class PagosRepository
                         pago = new()
                         {
                             Id = reader.GetInt32("id"),
+                            NroPago = reader.GetInt32("nroPago"),
                             IdContrato = reader.GetInt32("idContrato"),
                             FechaPago = reader.GetDateTime("fechaPago"),
                             Importe = reader.GetDouble("importe"),
                             Contrato = contrato,
 
                         };
+                        Console.WriteLine(pago);
                         pagos.Add(pago);
 
 
@@ -162,34 +165,47 @@ public class PagosRepository
 
     public int CreatePago(Pago pago)
     {
+        Console.WriteLine("NROPAGO " + pago.IdContrato);
         var res = -1;
-
-
-
+        List<Pago> pagosContrato = GetPagoByContratoId(pago.IdContrato);
+        int nroPago;
+        int nroPagoAnterior;
+        if (pagosContrato.Count <= 0)
+        {
+            nroPago = 1;
+        }
+        else
+        {
+            nroPagoAnterior = pagosContrato.Last().NroPago;
+            nroPago = nroPagoAnterior + 1;
+        }
 
 
         try
         {
             if (pago.FechaPago != DateTime.MinValue && pago.Importe != 0 && pago.IdContrato != 0)
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString)) ;
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
-                    using (MySqlConnection connection = new MySqlConnection(connectionString))
+                    string query = @"INSERT INTO `pagos`(`id`, `nroPago`, `idContrato`, `fechaPago`, `importe`) 
+                                 VALUES (NULL, @NroPago, @idContrato, @fechaPago, @importe);
+                                 SELECT LAST_INSERT_ID()";
+
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
-                        string query = @"INSERT INTO `pagos`(`id`, `idContrato`, `fechaPago`, `importe`) values (NULL, @idContrato, @fechaPago, @importe);
-                         SELECT LAST_INSERT_ID()";
+                        connection.Open();
+                        command.Parameters.AddWithValue("@NroPago", nroPago);
+                        command.Parameters.AddWithValue("@idContrato", pago.IdContrato);
+                        command.Parameters.AddWithValue("@fechaPago", pago.FechaPago);
+                        command.Parameters.AddWithValue("@importe", pago.Importe);
 
-                        using (MySqlCommand command = new(query, connection))
+                        using (MySqlDataReader reader = command.ExecuteReader())
                         {
-                            connection.Open();
-                            command.Parameters.AddWithValue("@idContrato", pago.IdContrato);
-                            command.Parameters.AddWithValue("@fechaPago", pago.FechaPago);
-                            command.Parameters.AddWithValue("@importe", pago.Importe);
-                            res = Convert.ToInt32(command.ExecuteScalar());
-                            connection.Close();
-
+                            if (reader.Read())
+                            {
+                                res = Convert.ToInt32(reader[0]);
+                            }
                         }
-
                     }
                 }
             }
@@ -198,14 +214,13 @@ public class PagosRepository
                 res = -1;
             }
         }
-
         catch (System.Exception)
         {
             throw;
         }
         return res;
-
     }
+
 
 
     public int DeletePago(int id)
@@ -252,7 +267,7 @@ public class PagosRepository
                     command.Parameters.AddWithValue("@id", pago.Id);
                     command.Parameters.AddWithValue("@idContrato", pago.IdContrato);
                     command.Parameters.AddWithValue("@fechaPago", pago.FechaPago);
-                    command.Parameters.AddWithValue("@importe", pago.Importe);            
+                    command.Parameters.AddWithValue("@importe", pago.Importe);
                     res = command.ExecuteNonQuery();
                     connection.Close();
                 }

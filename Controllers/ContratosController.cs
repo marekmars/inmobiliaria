@@ -1,9 +1,10 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Inmobiliaria.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Inmobiliaria.Controllers;
-
+[Authorize]
 public class ContratosController : Controller
 {
     private readonly ILogger<ContratosController> _logger;
@@ -62,6 +63,7 @@ public class ContratosController : Controller
     }
 
     [HttpPost]
+    [Authorize(Policy="Administrador")]
     public IActionResult Delete(int id, string resignacion)
     {
         try
@@ -82,41 +84,53 @@ public class ContratosController : Controller
             }
             else
             {
-                Contrato contrato = repo.GetContratoById(id);
-                if (contrato != null)
+                if (ContratoPagado(id))
                 {
-                    // Calcular la multa
-                    DateTime fechaFin = contrato.FechaFin;
-                    DateTime fechaHoy = DateTime.Now;
-                    TimeSpan tiempoTranscurrido = fechaHoy - fechaFin;
-                    int mesesTranscurridos = Math.Abs(tiempoTranscurrido.Days / 30);
-                    double multa;
-                    Console.WriteLine("tiempoTranscurrido: " + tiempoTranscurrido);
-                    Console.WriteLine("MESES: " + mesesTranscurridos);
-                    TempData["Inquilino"] = repoInquilino.GetInquilinoById(contrato.IdInquilino).ToString();
-                    if (mesesTranscurridos >= 2)
+                    Contrato contrato = repo.GetContratoById(id);
+                    if (contrato != null)
                     {
-                        multa = contrato.MontoMensual * 2;
-                        TempData["Multa"] ="$"+ multa;
+
+                        // Calcular la multa
+                        ContratoPagado(contrato.Id);
+                        DateTime fechaFin = contrato.FechaFin;
+                        DateTime fechaHoy = DateTime.Now;
+                        TimeSpan tiempoTranscurrido = fechaFin - fechaHoy;
+                        double diasTranscurridos = tiempoTranscurrido.Days;
+                        double mesesTranscurridos = Math.Round(diasTranscurridos / 30);
+                        Console.WriteLine("MEses transcurridos: " + mesesTranscurridos);
+                        double multa;
+
+                        TempData["Inquilino"] = repoInquilino.GetInquilinoById(contrato.IdInquilino).ToString();
+                        if (mesesTranscurridos >= 2)
+                        {
+                            multa = contrato.MontoMensual * 2;
+                            TempData["Multa"] = "$" + multa;
+                        }
+                        else
+                        {
+                            multa = contrato.MontoMensual;
+                            TempData["Multa"] = "$" + multa;
+                        }
+
+                        TempData["AlertMessage"] = $"Se resigno el contrato, el cliente debera abonar una multa de {TempData["Multa"]}";
+                        TempData["AlertType"] = "warning";
+
+
+                        contrato.Estado = false;
+                        contrato.FechaFin = fechaHoy;
+                        repo.UpdateContrato(contrato);
                     }
                     else
                     {
-                        multa = contrato.MontoMensual;
-                        TempData["Multa"] = "$"+multa;
+                        throw new Exception("Contrato no encontrado");
                     }
-
-                    TempData["AlertMessage"] = $"Se resigno el contrato, el cliente debera abonar una multa de {TempData["Multa"]}";
-                    TempData["AlertType"] = "warning";
-                    
-
-                    contrato.Estado = false;
-                    contrato.FechaFin = fechaHoy;
-                    repo.UpdateContrato(contrato);
                 }
                 else
                 {
-                    // Lógica para manejar el caso donde no se encuentra el contrato
+                    TempData["AlertMessage"] = $"No se pudo cancelar el contrato, debido a que el contrato no esta pagado en su totalidad";
+                    TempData["AlertType"] = "error";
                 }
+
             }
 
             return RedirectToAction("Index");
@@ -221,5 +235,31 @@ public class ContratosController : Controller
         // Si algo salió mal o el tipo no coincide, regresa un error u otra respuesta
         return BadRequest("Error al obtener los contratos");
     }
+    private bool ContratoPagado(int id)
+    {
+        ContratosRepository repo = new();
+        PagosRepository repoPagos = new();
+        var contrato = repo.GetContratoById(id);
+        DateTime fechaInicio = contrato.FechaInicio;
+        DateTime fechaHoy = DateTime.Now;
+        TimeSpan tiempoTranscurrido = fechaHoy - fechaInicio;
+        double diasTranscurridos = tiempoTranscurrido.Days + 1;
+        double mesesTranscurridos = Math.Round(diasTranscurridos / 30);
+        double valorParcialContrato = contrato.MontoMensual * mesesTranscurridos;
+        double totalPAgados = 0;
+        List<Pago> pagos = repoPagos.GetPagoByContratoId(id);
+        pagos.ForEach(pago => totalPAgados += pago.Importe);
+        double resto = valorParcialContrato - totalPAgados;
+        Console.WriteLine("resto: " + resto);
+        if (resto <= 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
 
+
+    }
 }

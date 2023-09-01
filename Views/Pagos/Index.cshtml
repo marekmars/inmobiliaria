@@ -51,7 +51,7 @@
 
                         <tr>
 
-                            <td>@Pago.Id</td>
+                            <td>@Pago.NroPago</td>
                             <td>@Pago.FechaPago.ToString("dd-MM-yyyy")</td>
                             <td>@Pago.Importe</td>
                             @if(Pago.Importe<Pago.Contrato.MontoMensual){
@@ -65,16 +65,20 @@
 
 
                             <td class="d-flex gap-2 justify-content-center align-items-center" >
-                              <form asp-action="Delete" asp-route-id="@Pago.Id" onsubmit="return confirmarEliminacion(event)">
-                                  <button type="submit" class="btn btn-outline-danger w-75 h-75 d-flex justify-content-center align-items-center">
-                                      <i class="fa-solid fa-trash"></i>  
-                                  </button>
-                              </form>
+                                 @if(User.IsInRole("Administrador"))
+                                   {
+                                    <form asp-action="Delete" asp-route-id="@Pago.Id" onsubmit="return confirmarEliminacion(event)">
+                                      <button type="submit" class="btn btn-outline-danger w-75 h-75 d-flex justify-content-center align-items-center">
+                                            <i class="fa-solid fa-trash"></i>  
+                                      </button>
+                                    </form>
+                                  }
+                              
                              <div >
-                               <a href="/Pagos/Update/@Pago.Id" class="btn btn-outline-primary w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-pen-to-square" style="cursor:pointer;"></i> </a>
+                               <a  asp-action="Update" asp-controller="Pagos" asp-route-id="@Pago.Id" class="btn btn-outline-primary w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-pen-to-square" style="cursor:pointer;"></i> </a>
                              </div>
                              <div >
-                               <a href="/Pagos/Details/@Pago.Id" class="btn btn-outline-info w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-eye style="cursor:pointer;""></i> </a>
+                               <a asp-action="Details" asp-controller="Pagos" asp-route-id="@Pago.Id" class="btn btn-outline-info w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-eye style="cursor:pointer;""></i> </a>
                              </div>
                              
                             </td>

@@ -49,16 +49,19 @@
                         <td>$@Inmueble.Precio </td>                      
                         
                         <td class="d-flex gap-2 justify-content-center align-items-center" >
-                          <form asp-action="Delete" asp-route-id="@Inmueble.Id" onsubmit="return confirmarEliminacion(event)">
-                              <button type="submit" class="btn btn-outline-danger w-75 h-75 d-flex justify-content-center align-items-center">
-                                  <i class="fa-solid fa-trash"></i>  
-                              </button>
-                          </form>
+                             @if(User.IsInRole("Administrador"))
+                                   {  
+                                       <form asp-action="Delete" asp-route-id="@Inmueble.Id" onsubmit="return confirmarEliminacion(event)">
+                                           <button type="submit" class="btn btn-outline-danger w-75 h-75 d-flex justify-content-center align-items-center">
+                                               <i class="fa-solid fa-trash"></i>  
+                                           </button>
+                                       </form>
+                                   }           
                          <div >
-                           <a href="/Inmuebles/Update/@Inmueble.Id" class="btn btn-outline-primary w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-pen-to-square" style="cursor:pointer;"></i> </a>
+                           <a asp-controller="Inmuebles" asp-action="Update" asp-route-id="@Inmueble.Id"  class="btn btn-outline-primary w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-pen-to-square" style="cursor:pointer;"></i> </a>
                          </div>
                          <div >
-                           <a href="/Inmuebles/Details/@Inmueble.Id" class="btn btn-outline-info w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-eye style="cursor:pointer;""></i> </a>
+                           <a asp-controller="Inmuebles" asp-action="Details" asp-route-id="@Inmueble.Id" class="btn btn-outline-info w-75  d-flex justify-content-center align-items-center"> <i class="fa-solid fa-eye style="cursor:pointer;""></i> </a>
                          </div>
                          <div >
                             <form asp-action="PausarPlay" asp-route-id="@Inmueble.Id">
