@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 26-08-2023 a las 01:24:18
+-- Tiempo de generación: 01-09-2023 a las 05:45:20
 -- Versión del servidor: 10.4.25-MariaDB
 -- Versión de PHP: 8.1.10
 
@@ -31,6 +31,7 @@ CREATE TABLE `contratos` (
   `id` int(11) NOT NULL,
   `idInquilino` int(11) NOT NULL,
   `idInmueble` int(11) NOT NULL,
+  `montoMensual` double NOT NULL,
   `fechaInicio` date NOT NULL,
   `fechaFin` date NOT NULL,
   `estado` tinyint(1) NOT NULL
@@ -40,12 +41,11 @@ CREATE TABLE `contratos` (
 -- Volcado de datos para la tabla `contratos`
 --
 
-INSERT INTO `contratos` (`id`, `idInquilino`, `idInmueble`, `fechaInicio`, `fechaFin`, `estado`) VALUES
-(7, 12, 52, '2023-09-21', '2023-10-22', 1),
-(9, 30, 1, '2023-08-24', '2023-09-10', 0),
-(10, 13, 51, '2023-08-26', '2023-10-29', 1),
-(11, 13, 1, '2023-09-22', '2023-10-08', 1),
-(12, 12, 1, '2023-08-25', '2023-09-10', 1);
+INSERT INTO `contratos` (`id`, `idInquilino`, `idInmueble`, `montoMensual`, `fechaInicio`, `fechaFin`, `estado`) VALUES
+(10, 13, 51, 85000, '2023-09-26', '2023-12-26', 1),
+(11, 13, 1, 95000, '2023-06-29', '2023-08-29', 0),
+(12, 12, 1, 189999, '2023-08-25', '2023-08-26', 0),
+(24, 9, 64, 120000, '2023-08-28', '2023-08-29', 0);
 
 -- --------------------------------------------------------
 
@@ -62,21 +62,23 @@ CREATE TABLE `inmuebles` (
   `cantAmbientes` int(11) NOT NULL,
   `latitud` double NOT NULL,
   `longitud` double NOT NULL,
-  `precio` double NOT NULL
+  `precio` double NOT NULL,
+  `estado` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `inmuebles`
 --
 
-INSERT INTO `inmuebles` (`id`, `idPropietario`, `direccion`, `uso`, `tipo`, `cantAmbientes`, `latitud`, `longitud`, `precio`) VALUES
-(1, 10, 'Calle San Martín 123', 'Personal', 'Departamento', 2, -33.2736103999, -66.3061100666, 150000),
-(50, 10, 'San Martin 987', 'Comercial', 'Local', 3, -322736103652, -633061162548, 95000),
-(51, 11, 'Av. del Sol 220', 'Comercial', 'Local', 3, -323459662332, -650102929894, 150000),
-(52, 10, 'Calle Inventada 123', 'Comercial', 'Local', 3, -3544564545644, -65456456544, 150000),
-(58, 35, 'Av. Illia 123', 'Comercial', 'Deposito', 3, -35.123456, -43.365412, 120000),
-(64, 11, 'qweqwe', 'Comercial', 'Local', 34, 33, 43, 3434343),
-(65, 80, 'Ruta 5 123', 'Comercial', 'Casa', 3, -32.123123123, -45.123123123, 150000);
+INSERT INTO `inmuebles` (`id`, `idPropietario`, `direccion`, `uso`, `tipo`, `cantAmbientes`, `latitud`, `longitud`, `precio`, `estado`) VALUES
+(1, 10, 'Calle San Martín 123', 'Personal', 'Departamento', 2, -33.2736103999, -66.3061100666, 10500000, 1),
+(50, 10, 'San Martin 987', 'Comercial', 'Local', 3, -322736103652, -633061162548, 25000000, 0),
+(51, 11, 'Av. del Sol 220', 'Comercial', 'Local', 3, -323459662332, -650102929894, 18000000, 1),
+(52, 10, 'Calle Inventada 123', 'Comercial', 'Local', 3, -3544564545644, -65456456544, 15000000, 0),
+(58, 35, 'Av. Illia 123', 'Comercial', 'Deposito', 3, -35.123456, -43.365412, 12000000, 1),
+(64, 11, 'qweqwe', 'Comercial', 'Local', 34, 33, 43, 34343430, 1),
+(65, 80, 'Ruta 5 123', 'Comercial', 'Casa', 3, -32.123123123, -45.123123123, 12340000, 0),
+(66, 85, 'Ruta 8 123', 'Comercial', 'Deposito', 4, -65.123456789, -45.789456123, 270000, 1);
 
 -- --------------------------------------------------------
 
@@ -111,10 +113,22 @@ INSERT INTO `inquilinos` (`id`, `dni`, `apellido`, `nombre`, `telefono`, `correo
 
 CREATE TABLE `pagos` (
   `id` int(11) NOT NULL,
+  `nroPago` int(11) NOT NULL,
   `idContrato` int(11) NOT NULL,
-  `fechaPago` date NOT NULL,
-  `importe` decimal(11,0) NOT NULL
+  `fechaPago` datetime NOT NULL,
+  `importe` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `pagos`
+--
+
+INSERT INTO `pagos` (`id`, `nroPago`, `idContrato`, `fechaPago`, `importe`) VALUES
+(19, 1, 10, '2023-08-29 00:00:00', 85000),
+(20, 2, 10, '2023-09-29 00:00:00', 85000),
+(21, 3, 10, '2023-10-29 00:00:00', 85000),
+(22, 1, 11, '2023-09-22 00:00:00', 95000),
+(24, 2, 11, '2023-10-22 00:00:00', 95000);
 
 -- --------------------------------------------------------
 
@@ -136,12 +150,42 @@ CREATE TABLE `propietarios` (
 --
 
 INSERT INTO `propietarios` (`id`, `dni`, `apellido`, `nombre`, `telefono`, `correo`) VALUES
-(9, '35.656.321', 'Rodriguez', 'Lujan', '+54 011-123456', 'lujan@mail.com'),
+(9, '35.656.321', 'Rodriguez', 'Lujan', '+54 011-123456', 'lujan2@mail.com'),
 (10, '15.355.987', 'Chavez', 'Marta', '+54 354-456783', 'marta@mail.com'),
 (11, '25.333.665', 'Baez', 'Juan Manuel', '+54 266-4698456', 'juanma@mail.com'),
 (35, '35.321.456', 'Javier', 'Romero', '+54 266-4659789', 'javiromero@mail.com'),
 (46, '11.111.111', 'Lucresia', 'Gomez', '+11 111-1111111', 'lucgomez@mail.com'),
-(80, '35.222.333', 'Silva', 'Marco', '+55 555-555555', 'marco@mail.com');
+(80, '35.222.333', 'Silva', 'Marco', '+55 555-555555', 'marco@mail.com'),
+(85, '25.365.981', 'Luciano Agustin', 'Lopez', '+54 266-4690397', 'lulopez@mail.com');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `usuarios`
+--
+
+CREATE TABLE `usuarios` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `apellido` varchar(50) NOT NULL,
+  `dni` varchar(50) NOT NULL,
+  `telefono` varchar(50) NOT NULL,
+  `correo` varchar(60) NOT NULL,
+  `clave` varchar(255) NOT NULL,
+  `avatar` varchar(255) NOT NULL,
+  `estado` tinyint(1) NOT NULL,
+  `rol` enum('Administrador','Empleado') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `usuarios`
+--
+
+INSERT INTO `usuarios` (`id`, `nombre`, `apellido`, `dni`, `telefono`, `correo`, `clave`, `avatar`, `estado`, `rol`) VALUES
+(18, 'Marco', 'Silva', '35111333', '+54 266-690347', 'marcosilva@mail.com', 'myl4T6FgkMUdldPQ96rZUnNYn0ho5fyVIc39WWFLd8Y=', '/Uploads\\avatar_18.jpg', 1, 'Empleado'),
+(19, 'Pepe', 'Silvia', '22.333.213', '+54 266-4569874', 'pepe@mail.com', 'myl4T6FgkMUdldPQ96rZUnNYn0ho5fyVIc39WWFLd8Y=', '/Uploads\\avatar_19.jpg', 1, 'Administrador'),
+(23, 'Maria Cristina', 'Rodriguez', '22.654.984', '+54 222-789654', 'maria@mail.com', 'myl4T6FgkMUdldPQ96rZUnNYn0ho5fyVIc39WWFLd8Y=', '/Uploads\\avatar_23.jpg', 1, 'Administrador'),
+(24, 'Juan Manuel', 'Romero', '39.456.999', '+54 123-9999999', 'juan@mail.com', 'myl4T6FgkMUdldPQ96rZUnNYn0ho5fyVIc39WWFLd8Y=', '/Uploads\\avatar_24_aebbaeec-e386-4525-99d1-e40cde17142e.jpg', 0, 'Empleado');
 
 --
 -- Índices para tablas volcadas
@@ -183,6 +227,12 @@ ALTER TABLE `propietarios`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
@@ -190,13 +240,13 @@ ALTER TABLE `propietarios`
 -- AUTO_INCREMENT de la tabla `contratos`
 --
 ALTER TABLE `contratos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT de la tabla `inmuebles`
 --
 ALTER TABLE `inmuebles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
 
 --
 -- AUTO_INCREMENT de la tabla `inquilinos`
@@ -208,13 +258,19 @@ ALTER TABLE `inquilinos`
 -- AUTO_INCREMENT de la tabla `pagos`
 --
 ALTER TABLE `pagos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT de la tabla `propietarios`
 --
 ALTER TABLE `propietarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
+
+--
+-- AUTO_INCREMENT de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- Restricciones para tablas volcadas
