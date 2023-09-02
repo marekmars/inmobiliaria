@@ -86,9 +86,9 @@ public class UsuariosController : Controller
             return View();
         }
     }
+    
+    
     [AllowAnonymous]
-    [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<ActionResult> Logout()
     {
         await HttpContext.SignOutAsync(
@@ -387,6 +387,7 @@ public ActionResult UpdateAvatar(Usuario usuario)
             if (!User.IsInRole("Administrador"))
             {
                 usuario.Rol = usuarioAnt.Rol;
+                usuario.Estado=usuarioAnt.Estado;
             }
 
             var res = _repo.UpdateUsuarioDatosPersonales(usuario);

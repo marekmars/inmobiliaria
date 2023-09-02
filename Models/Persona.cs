@@ -15,5 +15,6 @@ public abstract class Persona
     public string Telefono { get; set; } = "";
     [Required]
     public string Correo { get; set; } = "";
-
+    [Required]
+    public bool Estado { get; set; } = true;
 }

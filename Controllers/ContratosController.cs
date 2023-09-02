@@ -74,12 +74,7 @@ public class ContratosController : Controller
 
             if (string.IsNullOrWhiteSpace(resignacion))
             {
-                var pagos = repoPago.GetPagoByContratoId(id);
-                foreach (var pago in pagos)
-                {
-                    repoPago.DeletePago(pago.Id);
-                }
-
+                var pagos = repoPago.GetPagoByContratoId(id);                
                 repo.DeleteContrato(id);
             }
             else
@@ -116,8 +111,9 @@ public class ContratosController : Controller
                         TempData["AlertType"] = "warning";
 
 
-                        contrato.Estado = false;
+                        
                         contrato.FechaFin = fechaHoy;
+                        repo.DeleteContrato(contrato.Id);
                         repo.UpdateContrato(contrato);
                     }
                     else

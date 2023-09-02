@@ -133,14 +133,14 @@
             <input id="fechaFin" value="@Model.FechaFin.ToString("yyyy-MM-dd")" class="form-control" type="date" name="FechaFin" min="@Model.FechaInicio.ToString("yyyy-MM-dd")" required>
             <label for="FechaFin" class="ms-2">Fecha de Finalización</label>
         </div>
-
-        <div id="estadoSelect" class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center ">
+        @* <input id="estado" value="@Model.Estado" class="form-control" type="hidden" name="Estado" required> *@
+        @* <div id="estadoSelect" class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center ">
             <Select class="form-select" name="Estado">
                <option value=true selected="@(Model.Estado)">Activo</option>
                <option value=false selected="@(!Model.Estado)">Inactivo</option>
             </Select>
             <label for="Estado" class="ms-2">Estado</label>
-        </div>
+        </div> *@
         
         <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center ">
                <button type="button" class="btn btn-primary mx-auto" style="width: fit-content;" onclick="window.location.href = '/Contratos'"><i class="fa-solid fa-circle-left"></i></button>

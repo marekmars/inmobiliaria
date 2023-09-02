@@ -107,7 +107,7 @@ function mostrarAlertaConSelect(event, formId) {
       if (selectedOption === "delete") {
         // Acción de eliminar
         console.log(formElement.action);
-        confirmarEliminacionTotal(event);
+        confirmarEliminacion(event);
 
       } else if (selectedOption === "resignar") {
         // Acción de resignar

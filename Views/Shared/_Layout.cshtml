@@ -66,10 +66,11 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                       <li><a asp-controller="Usuarios" asp-action="Perfil" class="dropdown-item text-light " aria-current="page">Perfil</a></li>
-                      <li><form asp-controller="Usuarios" asp-action="Logout">
+                      <li><a class="dropdown-item " asp-controller="Usuarios" asp-action="Logout"><i class="fa-solid fa-right-to-bracket" style="transform: rotate(180deg);"></i> Logout </a> </li>
+                      @* <li><form asp-controller="Usuarios" asp-action="Logout">
                           <button class="dropdown-item"><i class="fa-solid fa-right-to-bracket" style="transform: rotate(180deg);"></i> Logout </button>
                            </form>
-                      </li>
+                      </li> *@
                       
                     </ul>
                   </div>

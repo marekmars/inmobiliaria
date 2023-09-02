@@ -22,7 +22,7 @@ public class ContratosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT `id`, `idInquilino`, `idInmueble`,`montoMensual`, `fechaInicio`, `fechaFin`, `estado` FROM `contratos`";
+            string query = "SELECT `id`, `idInquilino`, `idInmueble`,`montoMensual`, `fechaInicio`, `fechaFin`, `estado` FROM `contratos` ";
             InquilinosRepository inquilinosRepo = new();
             InmueblesRepository inmueblesRepo = new();
             using (MySqlCommand command = new(query, connection))
@@ -199,8 +199,8 @@ public class ContratosRepository
         var res = -1;
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string query = @"DELETE FROM `contratos`
-                            WHERE `id` = @id";
+            string query = @"UPDATE `contratos` SET `estado` = 0 WHERE `id` = @Id;";
+
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -229,7 +229,7 @@ public class ContratosRepository
             {
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
-                    string query = @"UPDATE `contratos` SET `fechaInicio` = @fechaInicio,`fechaFin` = @fechaFin,`montoMensual`= @montoMensual,`estado` = @estado,
+                    string query = @"UPDATE `contratos` SET `fechaInicio` = @fechaInicio,`fechaFin` = @fechaFin,`montoMensual`= @montoMensual,
                    `idInquilino` = @idInquilino , `idInmueble` = @idInmueble WHERE `id`= @Id" ;
 
                     using (MySqlCommand command = new(query, connection))
@@ -241,7 +241,6 @@ public class ContratosRepository
                         command.Parameters.AddWithValue("@montoMensual", contrato.MontoMensual);
                         command.Parameters.AddWithValue("@fechaInicio", contrato.FechaInicio);
                         command.Parameters.AddWithValue("@fechaFin", contrato.FechaFin);
-                        command.Parameters.AddWithValue("@estado", contrato.Estado);
                         res = command.ExecuteNonQuery();
                         connection.Close();
                     }

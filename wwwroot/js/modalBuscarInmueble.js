@@ -74,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("busquedaId").value = "Inmueble N°: " +inmueble.id;
                 document.getElementById("cardInmueble").classList.remove("d-none");
                 document.getElementById("formInputs").classList.remove("d-none");
+                document.getElementById("montoMensual").value = inmueble.precio;
 
               }
           });

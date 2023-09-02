@@ -71,19 +71,19 @@ public class InmueblesController : Controller
             Inmueble inmueble = repo.GetInmuebleById(id);
             Console.WriteLine("ESTADO INMUEBLE: " + inmueble.Estado);
 
-            if (inmueble.Estado)
+            if (inmueble.Disponible)
             {
-                inmueble.Estado = false;
+                inmueble.Disponible = false;
                 TempData["AlertMessage"] = "El Inmueble se pauso correctamente.";
                 TempData["AlertType"] = "success";
             }
             else
             {
-                inmueble.Estado = true;
+                inmueble.Disponible = true;
                 TempData["AlertMessage"] = "El Inmueble se encuentra disponible nuevamente.";
                 TempData["AlertType"] = "success";
             }
-            repo.UpdateInmuebleEstado(inmueble);
+            repo.UpdateInmuebleDisponible(inmueble);
 
             return RedirectToAction("index");
         }
@@ -205,6 +205,7 @@ public class InmueblesController : Controller
                 // Filtra los inmuebles activos por el término de búsqueda (puedes personalizar la lógica según tus necesidades)
                 var inmueblesFiltrados = inmuebles.Where(i =>
                     i.Estado == true &&
+                    i.Disponible == true &&
                     (i.Propietario.Nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                      i.Propietario.Apellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                      i.Propietario.Dni.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||

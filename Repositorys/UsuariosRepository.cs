@@ -185,7 +185,7 @@ public class UsuariosRepository
     }
     public int UpdateUsuarioDatosPersonales(Usuario usuario)
     {
-
+        
         var res = 0;
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {

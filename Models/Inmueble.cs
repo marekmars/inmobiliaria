@@ -29,4 +29,6 @@ public class Inmueble
     public double Precio { get; set; }
     [Required]
     public bool Estado { get; set; }=true;
+    [Required]
+    public bool Disponible { get; set; }=true;
 }

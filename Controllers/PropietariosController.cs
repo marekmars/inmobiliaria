@@ -40,8 +40,8 @@ public class PropietariosController : Controller
             var enumUso = repo2.GetEnumsTipes("uso");
             ViewBag.enumTipo = enumTipo;
             ViewBag.enumUso = enumUso;
-            
-          
+
+
 
             string returnUrl = Request.Headers["Referer"].ToString();
             Uri refererUri = new Uri(returnUrl);
@@ -103,12 +103,27 @@ public class PropietariosController : Controller
     }
 
     [HttpPost]
-    [Authorize(Policy="Administrador")]
+    [Authorize(Policy = "Administrador")]
     public IActionResult Delete(int id)
     {
         try
         {
             PropietariosRepository repo = new();
+            InmueblesRepository repoInmo = new();
+            ContratosRepository repoContrato = new();
+            var inmuebles = repo.GetAllInmueblesPropietario(id);
+
+            if (inmuebles.Count > 0)
+            {
+                foreach (var inmueble in inmuebles)
+                {
+                    repoInmo.DeleteInmueble(inmueble.Id);
+
+                }
+            }
+
+
+
             repo.DeletePropietario(id);
             return RedirectToAction("Index");
         }
@@ -210,6 +225,7 @@ public class PropietariosController : Controller
 
                 // Filtra los propietarios por el término de búsqueda (puedes personalizar la lógica según tus necesidades)
                 var propietariosFiltrados = propietarios.Where(p =>
+                    p.Estado == true &&
                     p.Nombre.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase) ||
                     p.Apellido.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase) ||
                     p.Dni.Contains(searchTerm, System.StringComparison.OrdinalIgnoreCase)

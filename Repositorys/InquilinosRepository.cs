@@ -20,7 +20,7 @@ public class InquilinosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM inquilinos ORDER BY apellido";
+            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM inquilinos WHERE estado=1 ORDER BY apellido ";
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -53,7 +53,7 @@ public class InquilinosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM inquilinos WHERE id=@id";
+            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM inquilinos WHERE id=@id AND estado=1";
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -85,7 +85,7 @@ public class InquilinosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM inquilinos WHERE dni=@dni";
+            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM inquilinos WHERE dni=@dni AND estado=1";
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -117,27 +117,25 @@ public class InquilinosRepository
         var res = -1;
         if (!EsNumeroTelefonoValido(inquilino.Telefono))
         {
-            res=-2;
+            res = -2;
             return res;
         }
 
         // Verificar si el correo electrónico es válido
         if (!EsCorreoElectronicoValido(inquilino.Correo))
         {
-            res=-3;
+            res = -3;
             return res;
         }
 
         // Verificar si el DNI es válido
         if (!EsDniValido(inquilino.Dni))
         {
-            res=-4;
+            res = -4;
             return res;
         }
 
         Inquilino inquilinoAux = GetInquilinoByDni(inquilino.Dni);
-
-    
 
         try
         {
@@ -145,8 +143,8 @@ public class InquilinosRepository
             {
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
-                    string query = @"INSERT INTO `inquilinos`( `dni`, `apellido`, `nombre`, `telefono`, `correo`) 
-            VALUES (@Dni, @Apellido, @Nombre, @Telefono, @Correo);
+                    string query = @"INSERT INTO `inquilinos`( `dni`, `apellido`, `nombre`, `telefono`, `correo`,estado) 
+            VALUES (@Dni, @Apellido, @Nombre, @Telefono, @Correo,@Estado);
             SELECT LAST_INSERT_ID()";
 
                     using (MySqlCommand command = new(query, connection))
@@ -156,6 +154,7 @@ public class InquilinosRepository
                         command.Parameters.AddWithValue("@Nombre", inquilino.Nombre);
                         command.Parameters.AddWithValue("@Telefono", inquilino.Telefono);
                         command.Parameters.AddWithValue("@Correo", inquilino.Correo);
+                        command.Parameters.AddWithValue("@Estado", true);
                         connection.Open();
                         res = Convert.ToInt32(command.ExecuteScalar());
                         inquilino.Id = res;
@@ -163,12 +162,14 @@ public class InquilinosRepository
 
                     }
                 }
-            }else{
+            }
+            else
+            {
                 res = -5;
             }
 
         }
-      
+
         catch (System.Exception)
         {
             throw;
@@ -185,8 +186,7 @@ public class InquilinosRepository
         var res = -1;
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string query = @"DELETE FROM `inquilinos`
-                        WHERE `id` = @id";
+            string query = @"UPDATE `inquilinos` SET `estado` = 0 WHERE `id` = @Id;";
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -195,6 +195,7 @@ public class InquilinosRepository
                 command.ExecuteNonQuery();
                 connection.Close();
             }
+
 
         }
         return res;
@@ -205,29 +206,29 @@ public class InquilinosRepository
     {
         var res = -1;
 
-       if (!EsNumeroTelefonoValido(inquilino.Telefono))
+        if (!EsNumeroTelefonoValido(inquilino.Telefono))
         {
-            res=-2;
+            res = -2;
             return res;
         }
 
         // Verificar si el correo electrónico es válido
         if (!EsCorreoElectronicoValido(inquilino.Correo))
         {
-            res=-3;
+            res = -3;
             return res;
         }
 
         // Verificar si el DNI es válido
         if (!EsDniValido(inquilino.Dni))
         {
-            res=-4;
+            res = -4;
             return res;
         }
-        
+
         Inquilino inquilinoAux = GetInquilinoByDni(inquilino.Dni);
 
-        if (inquilinoAux.Nombre == ""||inquilinoAux.Id==inquilino.Id)
+        if (inquilinoAux.Nombre == "" || inquilinoAux.Id == inquilino.Id)
         {
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
@@ -247,6 +248,7 @@ public class InquilinosRepository
                     command.Parameters.AddWithValue("@Nombre", inquilino.Nombre);
                     command.Parameters.AddWithValue("@Telefono", inquilino.Telefono);
                     command.Parameters.AddWithValue("@Correo", inquilino.Correo);
+
                     connection.Open();
                     res = command.ExecuteNonQuery();
                     connection.Close();
@@ -270,14 +272,14 @@ public class InquilinosRepository
 
     private bool EsCorreoElectronicoValido(string correo)
     {
-        
+
         string patron = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
         return Regex.IsMatch(correo, patron);
     }
 
     private bool EsDniValido(string dni)
     {
-       
+
         string patron = @"^\d{2}\.\d{3}\.\d{3}$";
         return Regex.IsMatch(dni, patron);
     }

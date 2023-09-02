@@ -21,7 +21,7 @@ public class PropietariosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM propietarios ORDER BY apellido";
+            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM propietarios WHERE estado=1 ORDER BY apellido ";
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -55,7 +55,7 @@ public class PropietariosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM propietarios WHERE id=@id ORDER BY apellido";
+            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM propietarios WHERE id=@id and estado=1 ORDER BY apellido";
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -87,7 +87,7 @@ public class PropietariosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM propietarios WHERE dni=@dni";
+            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM propietarios WHERE  dni=@dni and estado=1 ORDER BY apellido";
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -117,19 +117,19 @@ public class PropietariosRepository
     {
         var res = -1;
 
-       
+
 
         // Verificar si el correo electrónico es válido
         if (!EsCorreoElectronicoValido(propietario.Correo))
         {
-            res=-3;
+            res = -3;
             return res;
         }
 
         // Verificar si el DNI es válido
         if (!EsDniValido(propietario.Dni))
         {
-            res=-4;
+            res = -4;
             return res;
         }
 
@@ -141,8 +141,8 @@ public class PropietariosRepository
             {
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
-                    string query = @"INSERT INTO `propietarios`( `dni`, `apellido`, `nombre`, `telefono`, `correo`) 
-            VALUES (@Dni, @Apellido, @Nombre, @Telefono, @Correo);
+                    string query = @"INSERT INTO `propietarios`( `dni`, `apellido`, `nombre`, `telefono`, `correo`,estado) 
+            VALUES (@Dni, @Apellido, @Nombre, @Telefono, @Correo ,@Estado);
             SELECT LAST_INSERT_ID()";
 
                     using (MySqlCommand command = new(query, connection))
@@ -152,6 +152,7 @@ public class PropietariosRepository
                         command.Parameters.AddWithValue("@Nombre", propietario.Nombre);
                         command.Parameters.AddWithValue("@Telefono", propietario.Telefono);
                         command.Parameters.AddWithValue("@Correo", propietario.Correo);
+                        command.Parameters.AddWithValue("@Estado", true);
                         connection.Open();
                         res = Convert.ToInt32(command.ExecuteScalar());
                         propietario.Id = res;
@@ -180,8 +181,8 @@ public class PropietariosRepository
         var res = -1;
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string query = @"DELETE FROM `propietarios`
-                        WHERE `id` = @id";
+           string query = @"UPDATE `propietarios` SET `estado` = 0 WHERE `id` = @Id;";
+
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -200,25 +201,25 @@ public class PropietariosRepository
     {
         var res = -1;
 
-       
+
 
         // Verificar si el correo electrónico es válido
         if (!EsCorreoElectronicoValido(propietario.Correo))
         {
-            res=-3;
+            res = -3;
             return res;
         }
 
         // Verificar si el DNI es válido
         if (!EsDniValido(propietario.Dni))
         {
-            res=-4;
+            res = -4;
             return res;
         }
 
         Propietario propietarioAux = GetPropietarioByDni(propietario.Dni);
 
-        if (propietarioAux.Nombre == ""||propietarioAux.Id==propietario.Id)
+        if (propietarioAux.Nombre == "" || propietarioAux.Id == propietario.Id)
         {
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
@@ -253,15 +254,55 @@ public class PropietariosRepository
         return res;
 
     }
+    public List<Inmueble> GetAllInmueblesPropietario(int id)
+    {
+        List<Inmueble> inmuebles = new();
+        var propietariosRepo = new PropietariosRepository();
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            connection.Open();
+            string query = "SELECT id, idPropietario, direccion, uso, tipo, cantAmbientes, latitud, longitud, precio,estado FROM inmuebles WHERE idPropietario=@id AND estado=1";
 
+            using (MySqlCommand command = new(query, connection))
+            {
+                command.Parameters.AddWithValue("@Id", id);
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
 
-  
+                    while (reader.Read())
+                    {
+                        Propietario propietario = propietariosRepo.GetPropietarioById(id);
+
+                        Inmueble inmueble = new()
+                        {
+                            Id = reader.GetInt32("id"),
+                            Propietario = propietario,
+                            IdPropietario = reader.GetInt32("idPropietario"),
+                            Direccion = reader.GetString("direccion"),
+                            Uso = reader.GetString("uso"),
+                            Tipo = reader.GetString("tipo"),
+                            CantAmbientes = reader.GetInt32("cantAmbientes"),
+                            Latitud = reader.GetDouble("latitud"),
+                            Longitud = reader.GetDouble("longitud"),
+                            Precio = reader.GetDouble("precio"),
+                            Estado = reader.GetBoolean("estado")
+                        };
+
+                        inmuebles.Add(inmueble);
+                    }
+                    connection.Close();
+                }
+            }
+        }
+        return inmuebles;
+    }
 
     private bool EsCorreoElectronicoValido(string correo)
     {
         // Patrón de expresión regular para validar una dirección de correo electrónico
         string patron = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
         return Regex.IsMatch(correo, patron);
+
     }
 
     private bool EsDniValido(string dni)

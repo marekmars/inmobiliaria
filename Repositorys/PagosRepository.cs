@@ -162,23 +162,49 @@ public class PagosRepository
     //     //         return enumValues;
     //     //     }
     //     // }
+    public int ultimoPagoId(int id)
+    {
+        int ultimoNroPago = 0;
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            string query = @"SELECT *
+            FROM pagos WHERE idContrato=@id
+            ORDER BY CAST(`nroPago` AS SIGNED)  DESC
+            LIMIT 1";
 
+
+            using (MySqlCommand command = new(query, connection))
+            {
+                connection.Open();
+                command.Parameters.AddWithValue("@id", id);
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        ultimoNroPago = reader.GetInt32("nroPago");
+
+                    }
+                    connection.Close();
+                }
+            }
+        }
+        return ultimoNroPago;
+    }
     public int CreatePago(Pago pago)
     {
-        Console.WriteLine("NROPAGO " + pago.IdContrato);
         var res = -1;
-        List<Pago> pagosContrato = GetPagoByContratoId(pago.IdContrato);
-        int nroPago;
-        int nroPagoAnterior;
-        if (pagosContrato.Count <= 0)
+        int nroPago = ultimoPagoId(pago.IdContrato);
+        Console.WriteLine("nroPago " + nroPago);
+        if (nroPago == 0)
         {
             nroPago = 1;
         }
         else
         {
-            nroPagoAnterior = pagosContrato.Last().NroPago;
-            nroPago = nroPagoAnterior + 1;
+            nroPago = nroPago + 1;
         }
+
+
 
 
         try

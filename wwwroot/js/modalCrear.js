@@ -1,5 +1,5 @@
 function mostrarModalCrear(modalId, element) {
-  fetch("http://localhost:5065/Propietarios/Create")
+  fetch(`http://localhost:5065/${element}s/Create`)
     .then(function (response) {
       if (!response.ok) {
         throw new Error("No se recibió respuesta del servidor.");
@@ -11,10 +11,12 @@ function mostrarModalCrear(modalId, element) {
       tempElement.innerHTML = data;
 
       const formElement = tempElement.querySelector("form");
+      console.log(formElement);
 
       if (formElement) {
         const modalContent = document.getElementById("modal-content");
         modalContent.innerHTML = "";
+        modalContent.classList.add("text-light");
         modalContent.appendChild(formElement);
         const btn = formElement.querySelector("button[type='button']");
         if (btn) {
@@ -25,7 +27,8 @@ function mostrarModalCrear(modalId, element) {
       }
     })
     .then(function (response) {
-      const form = document.getElementById("form");
+      console.log("form"+element);
+      const form = document.getElementById("form"+element);
       console.log(element);
       form.action = `/${element}s/Create`;
       console.log(form.action);
@@ -48,10 +51,10 @@ function mostrarModalCrear(modalId, element) {
 
 document.querySelectorAll("button[type='button']").forEach(function (button) {
   if (button.id === "Propietario" || button.id === "Inquilino") {
+    console.log("ENTRO"+button.id);
     button.addEventListener("click", function (event) {
       const modalId = `modalCrear${event.target.id}`;
       const element = `${event.target.id}`;
-      console.log(event.target.id);
       if (event.target.id !== "") {
         mostrarModalCrear(modalId, element);
       }
