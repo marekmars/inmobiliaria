@@ -53,7 +53,7 @@ public class InquilinosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM inquilinos WHERE id=@id AND estado=1";
+            string query = "SELECT id, dni, apellido, nombre, telefono, correo,estado FROM inquilinos WHERE id=@id AND estado=1";
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -70,6 +70,7 @@ public class InquilinosRepository
                             Nombre = reader.GetString("nombre"),
                             Telefono = reader.GetString("telefono"),
                             Correo = reader.GetString("correo"),
+                            Estado = reader.GetBoolean("estado")
                         };
 
                     }
@@ -85,7 +86,7 @@ public class InquilinosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM inquilinos WHERE dni=@dni AND estado=1";
+            string query = "SELECT id, dni, apellido, nombre, telefono, estado, correo FROM inquilinos WHERE dni=@dni ";
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -102,6 +103,7 @@ public class InquilinosRepository
                             Nombre = reader.GetString("nombre"),
                             Telefono = reader.GetString("telefono"),
                             Correo = reader.GetString("correo"),
+                            Estado = reader.GetBoolean("estado")
                         };
 
                     }
@@ -134,16 +136,19 @@ public class InquilinosRepository
             res = -4;
             return res;
         }
-
+        
+    
+        
         Inquilino inquilinoAux = GetInquilinoByDni(inquilino.Dni);
+  
 
         try
         {
-            if (inquilinoAux.Nombre == "")
+            if (inquilinoAux.Nombre == ""||!inquilinoAux.Estado)
             {
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
-                    string query = @"INSERT INTO `inquilinos`( `dni`, `apellido`, `nombre`, `telefono`, `correo`,estado) 
+                    string query = @"INSERT INTO `inquilinos`( `dni`, `apellido`, `nombre`, `telefono`, `correo`,`estado`) 
             VALUES (@Dni, @Apellido, @Nombre, @Telefono, @Correo,@Estado);
             SELECT LAST_INSERT_ID()";
 
@@ -228,7 +233,7 @@ public class InquilinosRepository
 
         Inquilino inquilinoAux = GetInquilinoByDni(inquilino.Dni);
 
-        if (inquilinoAux.Nombre == "" || inquilinoAux.Id == inquilino.Id)
+        if (inquilinoAux.Nombre == "" || inquilinoAux.Id == inquilino.Id||!inquilinoAux.Estado)
         {
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
@@ -258,7 +263,7 @@ public class InquilinosRepository
         }
         else
         {
-            return -2;
+            return -5;
         }
         return res;
 

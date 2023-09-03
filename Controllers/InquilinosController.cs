@@ -28,7 +28,7 @@ public class InquilinosController : Controller
         return View();
     }
 
-    [HttpPost]
+
     [HttpPost]
     public IActionResult Create(Inquilino inquilino)
     {
@@ -38,8 +38,8 @@ public class InquilinosController : Controller
             InquilinosRepository repo = new();
             var res = repo.CreateInquilino(inquilino);
             InmueblesRepository repo2 = new();
-            var enumTipo = repo2.GetEnumsTipes("tipo");
-            var enumUso = repo2.GetEnumsTipes("uso");
+            var enumTipo = repo2.getEnumTipos();
+            var enumUso = repo2.getEnumUso();
             ViewBag.enumTipo = enumTipo;
             ViewBag.enumUso = enumUso;
 
@@ -52,14 +52,15 @@ public class InquilinosController : Controller
 
                 TempData["AlertMessage"] = "Inquilino creado correctamente.";
                 TempData["AlertType"] = "success";
-                
+                Console.WriteLine("RELATIVE PATH: " + relativePath);
 
-                if (relativePath == "/Inquilino/Create")
+
+                if (relativePath == "/Inquilinos/Create")
                 {
-                   
+
                     return Redirect("index");
                 }
-               
+
 
 
             }
@@ -102,7 +103,7 @@ public class InquilinosController : Controller
 
     }
     [HttpPost]
-    [Authorize(Policy="Administrador")]
+    [Authorize(Policy = "Administrador")]
     public IActionResult Delete(int id)
     {
         try
@@ -128,6 +129,10 @@ public class InquilinosController : Controller
     [HttpPost]
     public IActionResult Update(Inquilino inquilino)
     {
+
+        string returnUrl = Request.Headers["Referer"].ToString();
+        Uri refererUri = new Uri(returnUrl);
+        string relativePath = refererUri.GetComponents(UriComponents.PathAndQuery, UriFormat.SafeUnescaped);
         try
         {
             InquilinosRepository repo = new();
@@ -138,37 +143,37 @@ public class InquilinosController : Controller
 
                 TempData["AlertMessage"] = "Inquilino modificado correctamente.";
                 TempData["AlertType"] = "success";
-                return RedirectToAction("Index");
+                return Redirect("Index");
             }
             else if (res == -1)
             {
                 TempData["AlertMessage"] = "No se pudo modificar el inquilino, Error en la base de datos.";
                 TempData["AlertType"] = "error";
-                return RedirectToAction("Create");
+                return Redirect(relativePath);
             }
             else if (res == -2)
             {
                 TempData["AlertMessage"] = "No se pudo modificar el inquilino, Ingrese un numero telefonico valido.";
                 TempData["AlertType"] = "error";
-                return RedirectToAction("Create");
+                return Redirect(relativePath);
             }
             else if (res == -3)
             {
                 TempData["AlertMessage"] = "No se pudo modificar el inquilino, Ingrese un email valido.";
                 TempData["AlertType"] = "error";
-                return RedirectToAction("Create");
+                return Redirect(relativePath);
             }
             else if (res == -4)
             {
                 TempData["AlertMessage"] = "No se pudo modificar el inquilino, Ingrese un DNI valido.";
                 TempData["AlertType"] = "error";
-                return RedirectToAction("Create");
+                return Redirect(relativePath);
             }
             else
             {
                 TempData["AlertMessage"] = "No se pudo modificar el inquilino, Ya existe un inquilino con ese DNI.";
                 TempData["AlertType"] = "error";
-                return RedirectToAction("Create");
+                return Redirect(relativePath);
             }
         }
         catch (System.Exception)

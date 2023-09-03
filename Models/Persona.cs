@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Inmobiliaria.Models;
 public abstract class Persona
 {
+    public int Id { get; set; } 
     [Required]
     public string Dni { get; set; } = "";
     [Required]

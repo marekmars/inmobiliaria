@@ -20,38 +20,56 @@ public class UsuariosRepository
     public int CreateUsuario(Usuario usuario)
     {
         var res = -1;
-        using (MySqlConnection connection = new MySqlConnection(connectionString))
+
+        bool flag = CorreoExistente(usuario);
+        bool flag2=DniExistente(usuario);
+        Console.WriteLine("FLAG 2: "+flag2);
+        Console.WriteLine("FLAG: "+flag);
+        if (!flag2){
+            res=-3;
+            return res;
+        }
+        if (!flag)
         {
-            var query = @"INSERT INTO usuarios 
+            res=-2;
+            return res;
+        }
+
+        
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                var query = @"INSERT INTO usuarios 
             (Apellido,Nombre,Dni,Telefono,Correo,Estado,Clave,Avatar,Rol)
             VALUES (@apellido, @nombre, @dni, @telefono, @correo, @estado,@clave,@avatar,@rol);
             SELECT LAST_INSERT_ID()"; // devuelve el id insertado
-            using (var command = new MySqlCommand(query, connection))
-            {
-                command.CommandType = System.Data.CommandType.Text;
-                command.Parameters.AddWithValue("@apellido", usuario.Apellido);
-                command.Parameters.AddWithValue("@nombre", usuario.Nombre);
-                command.Parameters.AddWithValue("@dni", usuario.Dni);
-                command.Parameters.AddWithValue("@telefono", usuario.Telefono);
-                command.Parameters.AddWithValue("@correo", usuario.Correo);
-                command.Parameters.AddWithValue("@estado", usuario.Estado);
-                command.Parameters.AddWithValue("@clave", usuario.Clave);
-                if (String.IsNullOrEmpty(usuario.Avatar))
+                using (var command = new MySqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@avatar", "");
+                    command.CommandType = System.Data.CommandType.Text;
+                    command.Parameters.AddWithValue("@apellido", usuario.Apellido);
+                    command.Parameters.AddWithValue("@nombre", usuario.Nombre);
+                    command.Parameters.AddWithValue("@dni", usuario.Dni);
+                    command.Parameters.AddWithValue("@telefono", usuario.Telefono);
+                    command.Parameters.AddWithValue("@correo", usuario.Correo);
+                    command.Parameters.AddWithValue("@estado", true);
+                    command.Parameters.AddWithValue("@clave", usuario.Clave);
+                    if (String.IsNullOrEmpty(usuario.Avatar))
+                    {
+                        command.Parameters.AddWithValue("@avatar", "");
+                    }
+                    else
+                    {
+                        command.Parameters.AddWithValue("@avatar", usuario.Avatar);
+                    }
+                    command.Parameters.AddWithValue("@rol", usuario.Rol);
+                    connection.Open();
+                    res = Convert.ToInt32(command.ExecuteScalar());
+                    usuario.Id = res;
+                    connection.Close();
                 }
-                else
-                {
-                    command.Parameters.AddWithValue("@avatar", usuario.Avatar);
-                }
-                command.Parameters.AddWithValue("@rol", usuario.Rol);
-                connection.Open();
-                res = Convert.ToInt32(command.ExecuteScalar());
-                usuario.Id = res;
-                connection.Close();
             }
-        }
-        return res;
+            return res;
+        
+
     }
 
     public Usuario GetUserById(int id)
@@ -129,63 +147,29 @@ public class UsuariosRepository
         return usuario;
     }
 
-    // public int UpdateUsuario(Usuario usuario)
-    // {
-    //     var res = 0;
-    //     using (MySqlConnection connection = new MySqlConnection(connectionString))
-    //     {
-    //         var query = @"UPDATE usuarios SET
-    //         Nombre = @nombre,
-    //         Apellido = @apellido,
-    //         Dni = @dni,
-    //         Telefono = @telefono,
-    //         Correo = @correo,
-    //         Estado = @estado ,
-    //         Clave = @clave,
-    //         Avatar = @avatar,
-    //         Rol = @rol
-    //         WHERE Id = @id";
-    //         using (var command = new MySqlCommand(query, connection))
-    //         {
-    //             command.Parameters.AddWithValue("@id", usuario.Id);
-    //             command.Parameters.AddWithValue("@nombre", usuario.Nombre);
-    //             command.Parameters.AddWithValue("@apellido", usuario.Apellido);
-    //             command.Parameters.AddWithValue("@dni", usuario.Dni);
-    //             command.Parameters.AddWithValue("@telefono", usuario.Telefono);
-    //             command.Parameters.AddWithValue("@correo", usuario.Correo);
-    //             command.Parameters.AddWithValue("@estado", true);
-    //             command.Parameters.AddWithValue("@clave", usuario.Clave);
-    //             command.Parameters.AddWithValue("@avatar", usuario.Avatar);
-    //             command.Parameters.AddWithValue("@rol", usuario.Rol);
-    //             connection.Open();
-    //             res = command.ExecuteNonQuery();
-    //             connection.Close();
-    //         }
-    //     }
-    //     return res;
-    // }
+   
     public int UpdateAvatar(Usuario usuario)
     {
         var res = 0;
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                var query = @"UPDATE usuarios SET
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            var query = @"UPDATE usuarios SET
                 Avatar = @avatar
                 WHERE Id = @id";
-                using (var command = new MySqlCommand(query, connection))
-                { 
-                    command.Parameters.AddWithValue("@id", usuario.Id);
-                    command.Parameters.AddWithValue("@avatar", usuario.Avatar);
-                    connection.Open();
-                    res = command.ExecuteNonQuery();
-                    connection.Close();
-                }
+            using (var command = new MySqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@id", usuario.Id);
+                command.Parameters.AddWithValue("@avatar", usuario.Avatar);
+                connection.Open();
+                res = command.ExecuteNonQuery();
+                connection.Close();
             }
-            return res;
+        }
+        return res;
     }
     public int UpdateUsuarioDatosPersonales(Usuario usuario)
     {
-        
+
         var res = 0;
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
@@ -241,8 +225,9 @@ public class UsuariosRepository
         var res = -1;
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string query = @"DELETE FROM `usuarios`
-                        WHERE `id` = @id";
+            string query = @"UPDATE usuarios SET           
+            Estado = 0 
+            WHERE Id = @id";
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -263,7 +248,7 @@ public class UsuariosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT id, dni, apellido, nombre, telefono, correo,avatar,estado,rol FROM usuarios ORDER BY apellido";
+            string query = "SELECT id, dni, apellido, nombre, telefono, correo,avatar,estado,rol  FROM usuarios WHERE estado=1 ORDER BY apellido";
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -294,228 +279,74 @@ public class UsuariosRepository
         return usuarios;
     }
 
-    // public Propietario GetPropietarioById(int id)
-    // {
-    //     Propietario propietario = new();
-    //     using (MySqlConnection connection = new MySqlConnection(connectionString))
-    //     {
-    //         connection.Open();
-    //         string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM propietarios WHERE id=@id ORDER BY apellido";
+    public bool CorreoExistente(Usuario usuario)
+    {
+        Usuario usuarioAux = null; // Inicializa como null
 
-    //         using (MySqlCommand command = new(query, connection))
-    //         {
-    //             command.Parameters.AddWithValue("@id", id);
-    //             using (MySqlDataReader reader = command.ExecuteReader())
-    //             {
-    //                 while (reader.Read())
-    //                 {
-    //                     propietario = new()
-    //                     {
-    //                         Id = reader.GetInt32("id"),
-    //                         Dni = reader.GetString("dni"),
-    //                         Apellido = reader.GetString("apellido"),
-    //                         Nombre = reader.GetString("nombre"),
-    //                         Telefono = reader.GetString("telefono"),
-    //                         Correo = reader.GetString("correo"),
-    //                     };
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            connection.Open();
+            string query = @"SELECT 'Usuario' AS Tipo, Id, Nombre, Apellido, DNI, Correo
+                     FROM Usuarios
+                     WHERE Correo = @Correo
+                     AND estado=1;";
 
-    //                 }
-    //                 connection.Close();
-    //             }
-    //         }
-    //     }
-    //     return propietario;
-    // }
-    // public Propietario GetPropietarioByDni(string dni)
-    // {
-    //     Propietario propietario = new();
-    //     using (MySqlConnection connection = new MySqlConnection(connectionString))
-    //     {
-    //         connection.Open();
-    //         string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM propietarios WHERE dni=@dni";
+            using (MySqlCommand command = new(query, connection))
+            {
+                command.Parameters.AddWithValue("@Correo", usuario.Correo);
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        usuarioAux = new Usuario()
+                        {
+                            Id = reader.GetInt32("Id"),
+                            Dni = reader.GetString("DNI"),
+                            Apellido = reader.GetString("Apellido"),
+                            Nombre = reader.GetString("Nombre"),
+                            Correo = reader.GetString("Correo")
+                        };
+                    }
+                }
+            }
+        }
 
-    //         using (MySqlCommand command = new(query, connection))
-    //         {
-    //             command.Parameters.AddWithValue("@dni", dni);
-    //             using (MySqlDataReader reader = command.ExecuteReader())
-    //             {
-    //                 while (reader.Read())
-    //                 {
-    //                     propietario = new()
-    //                     {
-    //                         Id = reader.GetInt32("id"),
-    //                         Dni = reader.GetString("dni"),
-    //                         Apellido = reader.GetString("apellido"),
-    //                         Nombre = reader.GetString("nombre"),
-    //                         Telefono = reader.GetString("telefono"),
-    //                         Correo = reader.GetString("correo"),
-    //                     };
+        return usuarioAux == null;
+    }
+    public bool DniExistente(Usuario usuario)
+    {
+        Usuario? usuarioAux = null; 
 
-    //                 }
-    //                 connection.Close();
-    //             }
-    //         }
-    //     }
-    //     return propietario;
-    // }
-    // public int CreatePropietario(Propietario propietario)
-    // {
-    //     var res = -1;
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            connection.Open();
+            string query = @"SELECT 'Usuario' AS Tipo, Id, Nombre, Apellido, DNI, Correo
+                     FROM Usuarios
+                     WHERE Dni = @Dni
+                     AND estado=1;";
 
+            using (MySqlCommand command = new(query, connection))
+            {
+                command.Parameters.AddWithValue("@Dni", usuario.Dni);
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        usuarioAux = new Usuario()
+                        {
+                            Id = reader.GetInt32("id"),
+                            Dni = reader.GetString("dni"),
+                            Apellido = reader.GetString("apellido"),
+                            Nombre = reader.GetString("nombre"),
+                            Correo = reader.GetString("correo")
+                        };
+                    }
+                }
+            }
+        }
 
-
-    //     // Verificar si el correo electrónico es válido
-    //     if (!EsCorreoElectronicoValido(propietario.Correo))
-    //     {
-    //         res=-3;
-    //         return res;
-    //     }
-
-    //     // Verificar si el DNI es válido
-    //     if (!EsDniValido(propietario.Dni))
-    //     {
-    //         res=-4;
-    //         return res;
-    //     }
-
-    //     Propietario propietarioAux = GetPropietarioByDni(propietario.Dni);
-
-    //     try
-    //     {
-    //         if (propietarioAux.Nombre == "")
-    //         {
-    //             using (MySqlConnection connection = new MySqlConnection(connectionString))
-    //             {
-    //                 string query = @"INSERT INTO `propietarios`( `dni`, `apellido`, `nombre`, `telefono`, `correo`) 
-    //         VALUES (@Dni, @Apellido, @Nombre, @Telefono, @Correo);
-    //         SELECT LAST_INSERT_ID()";
-
-    //                 using (MySqlCommand command = new(query, connection))
-    //                 {
-    //                     command.Parameters.AddWithValue("@Dni", propietario.Dni);
-    //                     command.Parameters.AddWithValue("@Apellido", propietario.Apellido);
-    //                     command.Parameters.AddWithValue("@Nombre", propietario.Nombre);
-    //                     command.Parameters.AddWithValue("@Telefono", propietario.Telefono);
-    //                     command.Parameters.AddWithValue("@Correo", propietario.Correo);
-    //                     connection.Open();
-    //                     res = Convert.ToInt32(command.ExecuteScalar());
-    //                     propietario.Id = res;
-    //                     connection.Close();
-
-    //                 }
-
-    //             }
-    //         }
-    //         else
-    //         {
-    //             res = -2;
-    //         }
-    //     }
-
-    //     catch (System.Exception)
-    //     {
-    //         throw;
-    //     }
-    //     return res;
-
-    // }
-
-    // public int DeletePropietario(int id)
-    // {
-    //     var res = -1;
-    //     using (MySqlConnection connection = new MySqlConnection(connectionString))
-    //     {
-    //         string query = @"DELETE FROM `propietarios`
-    //                     WHERE `id` = @id";
-
-    //         using (MySqlCommand command = new(query, connection))
-    //         {
-    //             connection.Open();
-    //             command.Parameters.AddWithValue("@id", id);
-    //             command.ExecuteNonQuery();
-    //             connection.Close();
-    //         }
-
-    //     }
-    //     return res;
-
-    // }
-
-    // public int UpdatePropietario(Propietario propietario)
-    // {
-    //     var res = -1;
-
-
-
-    //     // Verificar si el correo electrónico es válido
-    //     if (!EsCorreoElectronicoValido(propietario.Correo))
-    //     {
-    //         res=-3;
-    //         return res;
-    //     }
-
-    //     // Verificar si el DNI es válido
-    //     if (!EsDniValido(propietario.Dni))
-    //     {
-    //         res=-4;
-    //         return res;
-    //     }
-
-    //     Propietario propietarioAux = GetPropietarioByDni(propietario.Dni);
-
-    //     if (propietarioAux.Nombre == ""||propietarioAux.Id==propietario.Id)
-    //     {
-    //         using (MySqlConnection connection = new MySqlConnection(connectionString))
-    //         {
-    //             string query = @"UPDATE `propietarios` SET 
-    //                     `dni` = @Dni,
-    //                     `apellido` = @Apellido,
-    //                     `nombre` = @Nombre,
-    //                     `telefono` = @Telefono,
-    //                     `correo` = @Correo
-    //                     WHERE `id` = @Id";
-
-    //             using (MySqlCommand command = new(query, connection))
-    //             {
-    //                 command.Parameters.AddWithValue("@Id", propietario.Id);
-    //                 command.Parameters.AddWithValue("@Dni", propietario.Dni);
-    //                 command.Parameters.AddWithValue("@Apellido", propietario.Apellido);
-    //                 command.Parameters.AddWithValue("@Nombre", propietario.Nombre);
-    //                 command.Parameters.AddWithValue("@Telefono", propietario.Telefono);
-    //                 command.Parameters.AddWithValue("@Correo", propietario.Correo);
-    //                 connection.Open();
-    //                 res = command.ExecuteNonQuery();
-    //                 connection.Close();
-    //             }
-
-    //         }
-    //     }
-    //     else
-    //     {
-    //         return -2;
-    //     }
-
-    //     return res;
-
-    // }
-
-
-
-
-    // private bool EsCorreoElectronicoValido(string correo)
-    // {
-    //     // Patrón de expresión regular para validar una dirección de correo electrónico
-    //     string patron = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-    //     return Regex.IsMatch(correo, patron);
-    // }
-
-    // private bool EsDniValido(string dni)
-    // {
-    //     // Patrón de expresión regular para validar un DNI argentino (formato: XX.XXX.XXX)
-    //     string patron = @"^\d{2}\.\d{3}\.\d{3}$";
-    //     return Regex.IsMatch(dni, patron);
-    // }
-
+        return usuarioAux == null;
+    }
     public List<String> GetEnumsTipes()
     {
 

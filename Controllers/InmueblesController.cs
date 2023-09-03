@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Inmobiliaria.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.VisualBasic;
 namespace Inmobiliaria.Controllers;
 
 [Authorize]
@@ -18,13 +19,15 @@ public class InmueblesController : Controller
     {
         InmueblesRepository repo = new();
         List<Inmueble> inmueble = repo.GetAllInmuebles();
+        Console.WriteLine(inmueble[0]);
+
         return View(inmueble);
     }
     public IActionResult Create()
     {
         InmueblesRepository repo = new();
-        var enumTipo = repo.GetEnumsTipes("tipo");
-        var enumUso = repo.GetEnumsTipes("uso");
+        var enumTipo = repo.getEnumTipos();
+        var enumUso = repo.getEnumUso();
         ViewBag.enumTipo = enumTipo;
         ViewBag.enumUso = enumUso;
         return View();
@@ -95,7 +98,7 @@ public class InmueblesController : Controller
     }
 
     [HttpPost]
-    [Authorize(Policy="Administrador")]
+    [Authorize(Policy = "Administrador")]
     public IActionResult Delete(int id)
     {
         try
@@ -113,8 +116,8 @@ public class InmueblesController : Controller
     {
         InmueblesRepository repo = new();
         var inmueble = repo.GetInmuebleById(id);
-        var enumTipo = repo.GetEnumsTipes("tipo");
-        var enumUso = repo.GetEnumsTipes("uso");
+        var enumTipo = repo.getEnumTipos();
+        var enumUso = repo.getEnumUso();
         ViewBag.enumTipo = enumTipo;
         ViewBag.enumUso = enumUso;
         return View(inmueble);
@@ -124,6 +127,7 @@ public class InmueblesController : Controller
     public IActionResult Update(Inmueble inmueble)
     {
         InmueblesRepository repo = new();
+        Console.WriteLine(inmueble.ToString());
         int res = repo.UpdateInmueble(inmueble);
         if (res > 0)
         {
@@ -172,6 +176,7 @@ public class InmueblesController : Controller
 
         InmueblesRepository repo = new();
         List<Inmueble> inmuebles = repo.GetAllInmuebles();
+        Console.WriteLine(inmuebles[1].ToString());
 
         if (inmuebles.Count > 0)
         {
@@ -198,7 +203,8 @@ public class InmueblesController : Controller
             {
                 if (string.IsNullOrEmpty(searchTerm))
                 {
-                    var inmueblesActivos = inmuebles.Where(i => i.Estado == true).ToList();
+                    var inmueblesActivos = inmuebles.Where(i => i.Estado == true&&
+                    i.Disponible == true).ToList();
                     return Json(inmueblesActivos); // Retorna los inmuebles activos si no hay término de búsqueda
                 }
 
@@ -209,10 +215,21 @@ public class InmueblesController : Controller
                     (i.Propietario.Nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                      i.Propietario.Apellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                      i.Propietario.Dni.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                     i.Direccion.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                     i.Tipo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                     i.Direccion.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                     || i.Tipo.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+
+                    )
                 ).ToList();
 
+                // var propiedades = typeof(Inmueble).GetProperties();
+
+                // foreach (var propiedad in propiedades)
+                // {
+                //     var nombrePropiedad = propiedad.Name;
+                //     var valorPropiedad = propiedad.GetValue(inmueblesFiltrados);
+
+                //     Console.WriteLine($"{nombrePropiedad}: {valorPropiedad}");
+                // }
                 return Json(inmueblesFiltrados);
             }
         }

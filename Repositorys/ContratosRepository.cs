@@ -165,7 +165,7 @@ public class ContratosRepository
                             command.Parameters.AddWithValue("@montoMensual", contrato.MontoMensual);
                             command.Parameters.AddWithValue("@fechaInicio", contrato.FechaInicio);
                             command.Parameters.AddWithValue("@fechaFin", contrato.FechaFin);
-                            command.Parameters.AddWithValue("@estado", contrato.Estado);
+                            command.Parameters.AddWithValue("@estado", true);
                             res = Convert.ToInt32(command.ExecuteScalar());
                             connection.Close();
 

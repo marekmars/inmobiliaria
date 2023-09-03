@@ -12,12 +12,12 @@
        
         <div class="container  d-flex flex-column gap-3" id="formInputs">
               <div id="fechaPago" class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
-                 <input id="fechaPago"  class="form-control" type="date" name="FechaPago" min="@Model.FechaInicio.ToString("yyyy-MM-dd")"required>
+                 <input id="fechaPago"  class="form-control" type="date" name="FechaPago" required>
                  <label for="FechaPago" class="ms-2">Fecha de Pago</label>
              </div>
 
              <div id="importe"class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center ">
-              <input id="fechaInicio" value=@Model.MontoMensual  class="form-control" type="number" name="Importe" placeholder="sad" required">
+              <input id="importe" value=@Model.MontoMensual  class="form-control" type="number" name="Importe" placeholder="sad" required">
               <label for="Importe" class="ms-2">Importe</label>
              </div>
 

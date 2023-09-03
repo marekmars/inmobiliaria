@@ -86,8 +86,8 @@ public class UsuariosController : Controller
             return View();
         }
     }
-    
-    
+
+
     [AllowAnonymous]
     public async Task<ActionResult> Logout()
     {
@@ -113,6 +113,9 @@ public class UsuariosController : Controller
     {
         try
         {
+            string returnUrl = Request.Headers["Referer"].ToString();
+            Uri refererUri = new Uri(returnUrl);
+            string relativePath = refererUri.GetComponents(UriComponents.PathAndQuery, UriFormat.SafeUnescaped);
             if (ClaveNuevamente != usuario.Clave)
             {
 
@@ -120,17 +123,31 @@ public class UsuariosController : Controller
                 TempData["AlertType"] = "error";
                 return RedirectToAction("Create");
             }
-            // TODO: Add insert logic here
+
             string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                    password: usuario.Clave,
-                    salt: System.Text.Encoding.ASCII.GetBytes(configuration["Salt"]),
-                    prf: KeyDerivationPrf.HMACSHA1,
-                    iterationCount: 1000,
-                    numBytesRequested: 256 / 8
-                ));
+                        password: usuario.Clave,
+                        salt: System.Text.Encoding.ASCII.GetBytes(configuration["Salt"]),
+                        prf: KeyDerivationPrf.HMACSHA1,
+                        iterationCount: 1000,
+                        numBytesRequested: 256 / 8
+                    ));
             usuario.Clave = hashed;
 
             var res = _repo.CreateUsuario(usuario);
+            if (res == -2)
+            {
+
+                TempData["AlertMessage"] = "Ya existe una cuenta registrada con ese email.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Create");
+
+            }
+            if (res == -3)
+            {
+                TempData["AlertMessage"] = "Ya existe una cuenta registrada con ese Dni.";
+                TempData["AlertType"] = "error";
+                return RedirectToAction("Create");
+            }
             if (usuario.AvatarFile != null && usuario.Id > 0)
             {
                 string wwwPath = environment.WebRootPath;
@@ -149,6 +166,7 @@ public class UsuariosController : Controller
                 _repo.UpdateAvatar(usuario);
 
             }
+
             TempData["AlertMessage"] = "Usuario creado correctamente";
             TempData["AlertType"] = "success";
             return RedirectToAction(nameof(Index));
@@ -271,47 +289,47 @@ public class UsuariosController : Controller
     //         throw;
     //     }
     // }
-  [HttpPost]
-public ActionResult UpdateAvatar(Usuario usuario)
-{
-    string returnUrl = Request.Headers["Referer"].ToString();
-    Uri refererUri = new Uri(returnUrl);
-    string relativePath = refererUri.GetComponents(UriComponents.PathAndQuery, UriFormat.SafeUnescaped);
-
-    if (usuario.AvatarFile != null)
+    [HttpPost]
+    public ActionResult UpdateAvatar(Usuario usuario)
     {
-        string wwwPath = environment.WebRootPath;
-        string path = Path.Combine(wwwPath, "Uploads");
-        if (!Directory.Exists(path))
+        string returnUrl = Request.Headers["Referer"].ToString();
+        Uri refererUri = new Uri(returnUrl);
+        string relativePath = refererUri.GetComponents(UriComponents.PathAndQuery, UriFormat.SafeUnescaped);
+
+        if (usuario.AvatarFile != null)
         {
-            Directory.CreateDirectory(path);
+            string wwwPath = environment.WebRootPath;
+            string path = Path.Combine(wwwPath, "Uploads");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            string fileName = "avatar_" + usuario.Id + "_" + Guid.NewGuid() + Path.GetExtension(usuario.AvatarFile.FileName);
+            string pathCompleto = Path.Combine(path, fileName);
+            usuario.Avatar = Path.Combine("/Uploads", fileName);
+
+            using (FileStream stream = new FileStream(pathCompleto, FileMode.Create))
+            {
+                usuario.AvatarFile.CopyTo(stream);
+            }
+
+            _repo.UpdateAvatar(usuario);
+
+            // Generar un identificador único para el parámetro de cache busting
+            string cacheBuster = Guid.NewGuid().ToString("N");
+
+            // Modificar la URL de la imagen para forzar la recarga
+            string avatarUrlWithCacheBuster = usuario.Avatar + "?v=" + cacheBuster;
+
+            usuario.Avatar = avatarUrlWithCacheBuster;
+
+            TempData["AlertMessage"] = "Avatar modificado Correctamente";
+            TempData["AlertType"] = "success";
         }
 
-        string fileName = "avatar_" + usuario.Id + "_" + Guid.NewGuid() + Path.GetExtension(usuario.AvatarFile.FileName);
-        string pathCompleto = Path.Combine(path, fileName);
-        usuario.Avatar = Path.Combine("/Uploads", fileName);
-
-        using (FileStream stream = new FileStream(pathCompleto, FileMode.Create))
-        {
-            usuario.AvatarFile.CopyTo(stream);
-        }
-
-        _repo.UpdateAvatar(usuario);
-
-        // Generar un identificador único para el parámetro de cache busting
-        string cacheBuster = Guid.NewGuid().ToString("N");
-
-        // Modificar la URL de la imagen para forzar la recarga
-        string avatarUrlWithCacheBuster = usuario.Avatar + "?v=" + cacheBuster;
-
-        usuario.Avatar = avatarUrlWithCacheBuster;
-
-        TempData["AlertMessage"] = "Avatar modificado Correctamente";
-        TempData["AlertType"] = "success";
+        return Redirect(relativePath);
     }
-
-    return Redirect(relativePath);
-}
 
 
     [HttpPost]
@@ -387,7 +405,7 @@ public ActionResult UpdateAvatar(Usuario usuario)
             if (!User.IsInRole("Administrador"))
             {
                 usuario.Rol = usuarioAnt.Rol;
-                usuario.Estado=usuarioAnt.Estado;
+                usuario.Estado = usuarioAnt.Estado;
             }
 
             var res = _repo.UpdateUsuarioDatosPersonales(usuario);

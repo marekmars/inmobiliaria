@@ -8,9 +8,6 @@ namespace Inmobiliaria.Models;
 public class Inquilino : Persona
 {
     
-     [Required]
-      [Key]
-    public int Id { get; set; }
     
     
  public override string ToString()

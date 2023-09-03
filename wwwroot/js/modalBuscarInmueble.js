@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
         inmueblesList.innerHTML = "";
 
         inmuebles.forEach(function (inmueble) {
+          console.log(inmueble);
           const inputGroup = document.createElement("div");
           inputGroup.classList.add("d-flex", "align-items-center", "mb-3");
 

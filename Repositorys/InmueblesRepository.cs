@@ -9,6 +9,19 @@ using System.Text.RegularExpressions;
 namespace Inmobiliaria.Models;
 public class InmueblesRepository
 {
+    private string[] enumTipo = Enum.GetNames(typeof(EnumTipo));
+    public List<string> getEnumTipos()
+    {
+        return enumTipo.ToList();
+    }
+    private string[] enumUso = Enum.GetNames(typeof(EnumUso));
+    public List<string> getEnumUso()
+    {
+        return enumUso.ToList();
+    }
+
+
+
 
     protected readonly string connectionString;
     public InmueblesRepository()
@@ -27,6 +40,8 @@ public class InmueblesRepository
             string query = @"SELECT id, idPropietario, direccion, uso, tipo, cantAmbientes, latitud, longitud, precio, estado,disponible
             FROM inmuebles
             WHERE estado = 1";
+            string tipo = "";
+            string uso = "";
 
 
             PropietariosRepository propietariosRepo = new();
@@ -37,6 +52,9 @@ public class InmueblesRepository
                     while (reader.Read())
                     {
                         Propietario propietario = propietariosRepo.GetPropietarioById(reader.GetInt32("idPropietario"));
+                        uso = reader.GetString("uso");
+                        tipo = reader.GetString("tipo");
+
 
                         Inmueble inmueble = new()
                         {
@@ -44,8 +62,6 @@ public class InmueblesRepository
                             Propietario = propietario,
                             IdPropietario = reader.GetInt32("idPropietario"),
                             Direccion = reader.GetString("direccion"),
-                            Uso = reader.GetString("uso"),
-                            Tipo = reader.GetString("tipo"),
                             CantAmbientes = reader.GetInt32("cantAmbientes"),
                             Latitud = reader.GetDouble("latitud"),
                             Longitud = reader.GetDouble("longitud"),
@@ -53,6 +69,9 @@ public class InmueblesRepository
                             Estado = reader.GetBoolean("estado"),
                             Disponible = reader.GetBoolean("disponible")
                         };
+
+                        inmueble.Tipo = (EnumTipo)Enum.Parse(typeof(EnumTipo), tipo);
+                        inmueble.Uso = (EnumUso)Enum.Parse(typeof(EnumUso), uso);
 
                         inmuebles.Add(inmueble);
                     }
@@ -72,6 +91,8 @@ public class InmueblesRepository
             connection.Open();
             string query = "SELECT id, idPropietario, direccion, uso, tipo, cantAmbientes, latitud, longitud, precio,estado,disponible FROM inmuebles WHERE id=@id";
             PropietariosRepository propietariosRepo = new();
+            string tipo = "";
+            string uso = "";
             using (MySqlCommand command = new(query, connection))
             {
                 command.Parameters.AddWithValue("@id", id);
@@ -80,14 +101,16 @@ public class InmueblesRepository
                     while (reader.Read())
                     {
                         Propietario propietario = propietariosRepo.GetPropietarioById(reader.GetInt32("idPropietario"));
+                        uso = reader.GetString("uso");
+                        tipo = reader.GetString("tipo");
 
                         inmueble = new()
                         {
                             Id = reader.GetInt32("id"),
                             Propietario = propietario,
                             Direccion = reader.GetString("direccion"),
-                            Uso = reader.GetString("uso"),
-                            Tipo = reader.GetString("tipo"),
+                            // Uso = reader.GetString("uso"),
+                            // Tipo = reader.GetString("tipo"),
                             CantAmbientes = reader.GetInt32("cantAmbientes"),
                             Latitud = reader.GetDouble("latitud"),
                             Longitud = reader.GetDouble("longitud"),
@@ -95,6 +118,8 @@ public class InmueblesRepository
                             Estado = reader.GetBoolean("estado"),
                             Disponible = reader.GetBoolean("disponible")
                         };
+                        inmueble.Tipo = (EnumTipo)Enum.Parse(typeof(EnumTipo), tipo);
+                        inmueble.Uso = (EnumUso)Enum.Parse(typeof(EnumUso), uso);
 
 
                     }
@@ -104,48 +129,48 @@ public class InmueblesRepository
         }
         return inmueble;
     }
-    public List<String> GetEnumsTipes(string atributo)
-    {
+    // public List<String> GetEnumsTipes(string atributo)
+    // {
 
-        {
-            List<string> enumValues = new List<string>();
+    //     {
+    //         List<string> enumValues = new List<string>();
 
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
+    //         using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //         {
+    //             connection.Open();
 
-                string query = $"SHOW COLUMNS FROM inmuebles LIKE '{atributo}'";
+    //             string query = $"SHOW COLUMNS FROM inmuebles LIKE '{atributo}'";
 
-                using (MySqlCommand command = new MySqlCommand(query, connection))
-                {
-                    using (MySqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            string enumDefinition = reader["Type"].ToString();
-                            enumDefinition = enumDefinition.Replace("enum(", "").Replace(")", "");
-                            string[] enumOptions = enumDefinition.Split(',');
+    //             using (MySqlCommand command = new MySqlCommand(query, connection))
+    //             {
+    //                 using (MySqlDataReader reader = command.ExecuteReader())
+    //                 {
+    //                     if (reader.Read())
+    //                     {
+    //                         string enumDefinition = reader["Type"].ToString();
+    //                         enumDefinition = enumDefinition.Replace("enum(", "").Replace(")", "");
+    //                         string[] enumOptions = enumDefinition.Split(',');
 
-                            foreach (string option in enumOptions)
-                            {
-                                enumValues.Add(option.Trim('\''));
-                            }
-                        }
-                    }
-                }
-            }
+    //                         foreach (string option in enumOptions)
+    //                         {
+    //                             enumValues.Add(option.Trim('\''));
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
 
-            return enumValues;
-        }
-    }
+    //         return enumValues;
+    //     }
+    // }
     public int CreateInmueble(Inmueble inmueble)
     {
         var res = -1;
 
         try
         {
-            if (inmueble.Direccion != "" && inmueble.Uso != "" && inmueble.Tipo != "" && inmueble.CantAmbientes != 0 && inmueble.IdPropietario != 0
-                && inmueble.Latitud != 0 && inmueble.Longitud != 0 && inmueble.Precio != 0 && inmueble.Uso != "")
+            if (inmueble.Direccion != "" && inmueble.Uso != 0 && inmueble.Tipo != 0 && inmueble.CantAmbientes != 0 && inmueble.IdPropietario != 0
+                && inmueble.Latitud != 0 && inmueble.Longitud != 0 && inmueble.Precio != 0 && inmueble.Uso != 0)
             {
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
@@ -210,10 +235,19 @@ public class InmueblesRepository
 
     public int UpdateInmueble(Inmueble inmueble)
     {
+        // var propiedades = typeof(Inmueble).GetProperties();
+
+        // foreach (var propiedad in propiedades)
+        // {
+        //     var nombrePropiedad = propiedad.Name;
+        //     var valorPropiedad = propiedad.GetValue(inmueble);
+
+        //     Console.WriteLine($"{nombrePropiedad}: {valorPropiedad}");
+        // }
         var res = -1;
 
-        if (inmueble.Direccion != "" && inmueble.Uso != "" && inmueble.Tipo != "" && inmueble.CantAmbientes != 0 && inmueble.IdPropietario != 0
-                        && inmueble.Latitud != 0 && inmueble.Longitud != 0 && inmueble.Precio != 0 && inmueble.Uso != "")
+        if (inmueble.Direccion != "" && inmueble.Uso.ToString() != "" && inmueble.Tipo.ToString() != "" && inmueble.CantAmbientes != 0 && inmueble.IdPropietario != 0
+                        && inmueble.Latitud != 0 && inmueble.Longitud != 0 && inmueble.Precio != 0)
         {
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
@@ -226,14 +260,15 @@ public class InmueblesRepository
                     command.Parameters.AddWithValue("@Id", inmueble.Id);
                     command.Parameters.AddWithValue("@IdPropietario", inmueble.IdPropietario);
                     command.Parameters.AddWithValue("@Direccion", inmueble.Direccion);
-                    command.Parameters.AddWithValue("@Uso", inmueble.Uso);
-                    command.Parameters.AddWithValue("@Tipo", inmueble.Tipo);
+                    command.Parameters.AddWithValue("@Uso", inmueble.Uso.ToString());
+                    command.Parameters.AddWithValue("@Tipo", inmueble.Tipo.ToString());
                     command.Parameters.AddWithValue("@CantAmbientes", inmueble.CantAmbientes);
                     command.Parameters.AddWithValue("@Latitud", inmueble.Latitud);
                     command.Parameters.AddWithValue("@Longitud", inmueble.Longitud);
                     command.Parameters.AddWithValue("@Precio", inmueble.Precio);
                     res = command.ExecuteNonQuery();
                     connection.Close();
+                    Console.WriteLine("RESULT: " + res);
                 }
 
             }

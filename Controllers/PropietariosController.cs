@@ -36,8 +36,8 @@ public class PropietariosController : Controller
             PropietariosRepository repo = new();
             var res = repo.CreatePropietario(propietario);
             InmueblesRepository repo2 = new();
-            var enumTipo = repo2.GetEnumsTipes("tipo");
-            var enumUso = repo2.GetEnumsTipes("uso");
+            var enumTipo = repo2.getEnumTipos();
+            var enumUso = repo2.getEnumUso();
             ViewBag.enumTipo = enumTipo;
             ViewBag.enumUso = enumUso;
 
