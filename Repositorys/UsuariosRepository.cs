@@ -11,6 +11,11 @@ public class UsuariosRepository
 {
 
     protected readonly string connectionString;
+    private string[] enumRol = Enum.GetNames(typeof(EnumRol));
+    public List<string> getEnumRol()
+    {
+        return enumRol.ToList();
+    }
 
     public UsuariosRepository()
     {
@@ -22,53 +27,54 @@ public class UsuariosRepository
         var res = -1;
 
         bool flag = CorreoExistente(usuario);
-        bool flag2=DniExistente(usuario);
-        Console.WriteLine("FLAG 2: "+flag2);
-        Console.WriteLine("FLAG: "+flag);
-        if (!flag2){
-            res=-3;
+        bool flag2 = DniExistente(usuario);
+        Console.WriteLine("FLAG 2: " + flag2);
+        Console.WriteLine("FLAG: " + flag);
+        if (!flag2)
+        {
+            res = -3;
             return res;
         }
         if (!flag)
         {
-            res=-2;
+            res = -2;
             return res;
         }
 
-        
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                var query = @"INSERT INTO usuarios 
+
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            var query = @"INSERT INTO usuarios 
             (Apellido,Nombre,Dni,Telefono,Correo,Estado,Clave,Avatar,Rol)
             VALUES (@apellido, @nombre, @dni, @telefono, @correo, @estado,@clave,@avatar,@rol);
             SELECT LAST_INSERT_ID()"; // devuelve el id insertado
-                using (var command = new MySqlCommand(query, connection))
+            using (var command = new MySqlCommand(query, connection))
+            {
+                command.CommandType = System.Data.CommandType.Text;
+                command.Parameters.AddWithValue("@apellido", usuario.Apellido);
+                command.Parameters.AddWithValue("@nombre", usuario.Nombre);
+                command.Parameters.AddWithValue("@dni", usuario.Dni);
+                command.Parameters.AddWithValue("@telefono", usuario.Telefono);
+                command.Parameters.AddWithValue("@correo", usuario.Correo);
+                command.Parameters.AddWithValue("@estado", true);
+                command.Parameters.AddWithValue("@clave", usuario.Clave);
+                if (String.IsNullOrEmpty(usuario.Avatar))
                 {
-                    command.CommandType = System.Data.CommandType.Text;
-                    command.Parameters.AddWithValue("@apellido", usuario.Apellido);
-                    command.Parameters.AddWithValue("@nombre", usuario.Nombre);
-                    command.Parameters.AddWithValue("@dni", usuario.Dni);
-                    command.Parameters.AddWithValue("@telefono", usuario.Telefono);
-                    command.Parameters.AddWithValue("@correo", usuario.Correo);
-                    command.Parameters.AddWithValue("@estado", true);
-                    command.Parameters.AddWithValue("@clave", usuario.Clave);
-                    if (String.IsNullOrEmpty(usuario.Avatar))
-                    {
-                        command.Parameters.AddWithValue("@avatar", "");
-                    }
-                    else
-                    {
-                        command.Parameters.AddWithValue("@avatar", usuario.Avatar);
-                    }
-                    command.Parameters.AddWithValue("@rol", usuario.Rol);
-                    connection.Open();
-                    res = Convert.ToInt32(command.ExecuteScalar());
-                    usuario.Id = res;
-                    connection.Close();
+                    command.Parameters.AddWithValue("@avatar", "");
                 }
+                else
+                {
+                    command.Parameters.AddWithValue("@avatar", usuario.Avatar);
+                }
+                command.Parameters.AddWithValue("@rol", usuario.Rol.ToString());
+                connection.Open();
+                res = Convert.ToInt32(command.ExecuteScalar());
+                usuario.Id = res;
+                connection.Close();
             }
-            return res;
-        
+        }
+        return res;
+
 
     }
 
@@ -78,6 +84,7 @@ public class UsuariosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             string sql = @"SELECT Id, Apellido,Nombre,Dni,Telefono,Correo,Estado,Clave,Avatar,Rol FROM usuarios WHERE Id = @id";
+            string rol = "";
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@id", id);
@@ -86,6 +93,7 @@ public class UsuariosRepository
                 {
                     while (reader.Read())
                     {
+                        rol = reader.GetString("rol");
                         usuario = new()
                         {
                             Id = reader.GetInt32("id"),
@@ -97,8 +105,8 @@ public class UsuariosRepository
                             Estado = reader.GetBoolean("estado"),
                             Clave = reader.GetString("clave"),
                             Avatar = reader.GetString("avatar"),
-                            Rol = reader.GetString("rol"),
                         };
+                        usuario.Rol = (EnumRol)Enum.Parse(typeof(EnumRol), rol);
 
                     }
                     connection.Close();
@@ -115,6 +123,7 @@ public class UsuariosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             string sql = @"SELECT Id, Apellido,Nombre,Dni,Telefono,Correo,Estado,Clave,Avatar,Rol FROM usuarios WHERE correo = @correo";
+            string rol = "";
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@correo", correo);
@@ -123,6 +132,7 @@ public class UsuariosRepository
                 {
                     while (reader.Read())
                     {
+                        rol = reader.GetString("rol");
                         usuario = new()
                         {
                             Id = reader.GetInt32("id"),
@@ -134,8 +144,9 @@ public class UsuariosRepository
                             Estado = reader.GetBoolean("estado"),
                             Clave = reader.GetString("clave"),
                             Avatar = reader.GetString("avatar"),
-                            Rol = reader.GetString("rol"),
+
                         };
+                        usuario.Rol = (EnumRol)Enum.Parse(typeof(EnumRol), rol);
 
                     }
                     connection.Close();
@@ -147,7 +158,7 @@ public class UsuariosRepository
         return usuario;
     }
 
-   
+
     public int UpdateAvatar(Usuario usuario)
     {
         var res = 0;
@@ -189,7 +200,7 @@ public class UsuariosRepository
                 command.Parameters.AddWithValue("@apellido", usuario.Apellido);
                 command.Parameters.AddWithValue("@correo", usuario.Correo);
                 command.Parameters.AddWithValue("@dni", usuario.Dni);
-                command.Parameters.AddWithValue("@rol", usuario.Rol);
+                command.Parameters.AddWithValue("@rol", usuario.Rol.ToString());
                 command.Parameters.AddWithValue("@telefono", usuario.Telefono);
                 command.Parameters.AddWithValue("@estado", usuario.Estado);
 
@@ -249,13 +260,14 @@ public class UsuariosRepository
         {
             connection.Open();
             string query = "SELECT id, dni, apellido, nombre, telefono, correo,avatar,estado,rol  FROM usuarios WHERE estado=1 ORDER BY apellido";
-
+            string rol = "";
             using (MySqlCommand command = new(query, connection))
             {
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
+                        rol = reader.GetString("rol");
                         Usuario usuario = new()
                         {
                             Id = reader.GetInt32("id"),
@@ -266,8 +278,9 @@ public class UsuariosRepository
                             Correo = reader.GetString("correo"),
                             Avatar = reader.GetString("avatar"),
                             Estado = reader.GetBoolean("estado"),
-                            Rol = reader.GetString("rol"),
+
                         };
+                        usuario.Rol = (EnumRol)Enum.Parse(typeof(EnumRol), rol);
 
                         usuarios.Add(usuario);
                     }
@@ -315,7 +328,7 @@ public class UsuariosRepository
     }
     public bool DniExistente(Usuario usuario)
     {
-        Usuario? usuarioAux = null; 
+        Usuario? usuarioAux = null;
 
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
@@ -347,38 +360,38 @@ public class UsuariosRepository
 
         return usuarioAux == null;
     }
-    public List<String> GetEnumsTipes()
-    {
+    // public List<String> GetEnumsTipes()
+    // {
 
-        {
-            List<string> enumValues = new List<string>();
+    //     {
+    //         List<string> enumValues = new List<string>();
 
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
+    //         using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //         {
+    //             connection.Open();
 
-                string query = $"SHOW COLUMNS FROM usuarios LIKE 'rol'";
+    //             string query = $"SHOW COLUMNS FROM usuarios LIKE 'rol'";
 
-                using (MySqlCommand command = new MySqlCommand(query, connection))
-                {
-                    using (MySqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            string enumDefinition = reader["Type"].ToString();
-                            enumDefinition = enumDefinition.Replace("enum(", "").Replace(")", "");
-                            string[] enumOptions = enumDefinition.Split(',');
+    //             using (MySqlCommand command = new MySqlCommand(query, connection))
+    //             {
+    //                 using (MySqlDataReader reader = command.ExecuteReader())
+    //                 {
+    //                     if (reader.Read())
+    //                     {
+    //                         string enumDefinition = reader["Type"].ToString();
+    //                         enumDefinition = enumDefinition.Replace("enum(", "").Replace(")", "");
+    //                         string[] enumOptions = enumDefinition.Split(',');
 
-                            foreach (string option in enumOptions)
-                            {
-                                enumValues.Add(option.Trim('\''));
-                            }
-                        }
-                    }
-                }
-            }
+    //                         foreach (string option in enumOptions)
+    //                         {
+    //                             enumValues.Add(option.Trim('\''));
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
 
-            return enumValues;
-        }
-    }
+    //         return enumValues;
+    //     }
+    // }
 }

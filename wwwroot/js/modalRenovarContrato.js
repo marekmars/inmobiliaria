@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       })
       .then(function (response) {
-        const form = document.getElementById("form");
+        const form = document.getElementById("formContrato");
         document.getElementById("Inquilino").classList.add("d-none");
         document.getElementById("formInputs").classList.remove("d-none");
         document.getElementById("datosInmueble").classList.remove("d-none");

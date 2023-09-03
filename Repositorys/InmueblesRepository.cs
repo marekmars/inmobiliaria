@@ -109,8 +109,6 @@ public class InmueblesRepository
                             Id = reader.GetInt32("id"),
                             Propietario = propietario,
                             Direccion = reader.GetString("direccion"),
-                            // Uso = reader.GetString("uso"),
-                            // Tipo = reader.GetString("tipo"),
                             CantAmbientes = reader.GetInt32("cantAmbientes"),
                             Latitud = reader.GetDouble("latitud"),
                             Longitud = reader.GetDouble("longitud"),
@@ -183,8 +181,8 @@ public class InmueblesRepository
                         connection.Open();
                         command.Parameters.AddWithValue("@IdPropietario", inmueble.IdPropietario);
                         command.Parameters.AddWithValue("@Direccion", inmueble.Direccion);
-                        command.Parameters.AddWithValue("@Uso", inmueble.Uso);
-                        command.Parameters.AddWithValue("@Tipo", inmueble.Tipo);
+                        command.Parameters.AddWithValue("@Uso", inmueble.Uso.ToString());
+                        command.Parameters.AddWithValue("@Tipo", inmueble.Tipo.ToString());
                         command.Parameters.AddWithValue("@CantAmbientes", inmueble.CantAmbientes);
                         command.Parameters.AddWithValue("@Latitud", inmueble.Latitud);
                         command.Parameters.AddWithValue("@Longitud", inmueble.Longitud);

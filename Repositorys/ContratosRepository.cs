@@ -141,8 +141,7 @@ public class ContratosRepository
     
 
         bool disponibilidad = VerificarDisponibilidad(contrato);
-
-
+        Console.WriteLine("ENTRO CONTRATOS");
         try
         {
 

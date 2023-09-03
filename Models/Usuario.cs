@@ -7,8 +7,14 @@ public class Usuario : Persona {
     public string? Clave { get ; set ; }
     public string? Avatar { get ; set ; }
     public IFormFile? AvatarFile { get ; set ; }
-    public string? Rol { get ; set ; }
+    public EnumRol Rol { get ; set ; }
     
    
+}
+public enum EnumRol
+{
+    Administrador,
+    Empleado,
+
 }
 

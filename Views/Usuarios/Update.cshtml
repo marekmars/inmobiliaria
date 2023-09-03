@@ -18,7 +18,7 @@
             <select id="rol" class="form-select" name="Rol" required>
             @foreach (var rol in ViewBag.roles)
             {
-                <option value="@rol" selected="@(rol == Model.Rol)">@rol</option>
+                <option value="@rol" selected="@(rol == Model.Rol.ToString())">@rol</option>
             }
             </select>
             <label for="Rol" class="ms-2">Rol</label>
@@ -106,7 +106,8 @@
         </div>
        </div>
        <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center ">
-               <a  class="btn btn-primary mx-auto" style="width: fit-content;" asp-controller="Home" asp-action="Index"><i class="fa-solid fa-circle-left"></i></a>
+
+               <a  class="btn btn-primary mx-auto" style="width: fit-content;" asp-controller=@(User.IsInRole("Administrador")?"Usuarios":"Home") asp-action="Index"><i class="fa-solid fa-circle-left"></i></a>
                
         </div>
         

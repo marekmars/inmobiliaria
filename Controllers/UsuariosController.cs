@@ -68,7 +68,7 @@ public class UsuariosController : Controller
                 var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, r.Correo),
-                        new Claim(ClaimTypes.Role, r.Rol)
+                        new Claim(ClaimTypes.Role, r.Rol.ToString())
                     };
                 var claimsIdentity = new ClaimsIdentity(
                     claims, CookieAuthenticationDefaults.AuthenticationScheme
@@ -101,7 +101,7 @@ public class UsuariosController : Controller
     public IActionResult Create()
     {
         UsuariosRepository repo = new();
-        var roles = repo.GetEnumsTipes();
+        var roles = repo.getEnumRol();
         ViewBag.roles = roles;
         return View();
     }
@@ -180,7 +180,7 @@ public class UsuariosController : Controller
     public ActionResult Perfil()
     {
         UsuariosRepository repo = new();
-        var roles = repo.GetEnumsTipes();
+        var roles = repo.getEnumRol();
         ViewBag.roles = roles;
         ViewBag.Titulo = "Mi Perfil";
         var u = _repo.GetUserByMail(User.Identity.Name);
@@ -191,7 +191,7 @@ public class UsuariosController : Controller
     public ActionResult Update(int id)
     {
         UsuariosRepository repo = new();
-        var roles = repo.GetEnumsTipes();
+        var roles = repo.getEnumRol();
         ViewBag.roles = roles;
         ViewBag.Titulo = "Modificar Usuario";
         var usuario = _repo.GetUserById(id);
@@ -409,7 +409,7 @@ public class UsuariosController : Controller
             }
 
             var res = _repo.UpdateUsuarioDatosPersonales(usuario);
-            ViewBag.Roles = _repo.GetEnumsTipes();
+            ViewBag.Roles = _repo.getEnumRol();
             if (res < 0)
             {
                 TempData["AlertMessage"] = "Error al modificar el usuario";
