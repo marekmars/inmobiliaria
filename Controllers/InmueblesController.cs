@@ -61,8 +61,6 @@ public class InmueblesController : Controller
         return View();
     }
 
-
-
     [HttpPost]
     public IActionResult Create(Inmueble inmueble)
     {

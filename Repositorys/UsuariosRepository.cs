@@ -11,6 +11,7 @@ public class UsuariosRepository
 {
 
     protected readonly string connectionString;
+    
     private string[] enumRol = Enum.GetNames(typeof(EnumRol));
     public List<string> getEnumRol()
     {
@@ -19,7 +20,7 @@ public class UsuariosRepository
 
     public UsuariosRepository()
     {
-        connectionString = "Server=localhost;User=root;Password=;Database=inmobiliaria;SslMode=none";
+        connectionString = Conexion.GetConnection;
     }
 
     public int CreateUsuario(Usuario usuario)

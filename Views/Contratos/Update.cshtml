@@ -146,6 +146,7 @@
                <button type="button" class="btn btn-primary mx-auto" style="width: fit-content;" onclick="window.location.href = '/Contratos'"><i class="fa-solid fa-circle-left"></i></button>
                <button id="btnRegistrar" type="submit" class="btn btn-success mx-auto" style="width: fit-content;"><i class="fa-solid fa-file-circle-plus"></i></button>
         </div>
+         <input type="hidden" id="urlReferencia" name="urlReferencia" value="" />
             
       </form>
   
@@ -171,4 +172,7 @@
           </text>
       }
     </script>
-
+<script>
+    
+    document.getElementById("urlReferencia").value = document.referrer;
+</script>

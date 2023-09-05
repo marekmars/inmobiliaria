@@ -13,7 +13,7 @@ public class ContratosRepository
     protected readonly string connectionString;
     public ContratosRepository()
     {
-        connectionString = "Server=localhost;User=root;Password=;Database=inmobiliaria;SslMode=none";
+        connectionString = Conexion.GetConnection;
     }
 
     public List<Contrato> GetAllContratos(bool vig)
@@ -73,7 +73,7 @@ public class ContratosRepository
         List<Contrato> contratos = new();
         string query = @"SELECT `id`, `idInquilino`, `idInmueble`, `montoMensual`, `fechaInicio`, `fechaFin`, `estado` 
         FROM `contratos` 
-        WHERE `fechaInicio` <=@Hasta  AND `fechaFin` >= @Desde";
+        WHERE `fechaInicio` <=@Hasta  AND `fechaFin` >= @Desde and estado = 1";
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
@@ -85,6 +85,54 @@ public class ContratosRepository
             {
                 command.Parameters.AddWithValue("@Desde", desde);
                 command.Parameters.AddWithValue("@Hasta", hasta);
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Inquilino inquilino = inquilinosRepo.GetInquilinoById(reader.GetInt32("idInquilino"));
+                        Inmueble inmueble = inmueblesRepo.GetInmuebleById(reader.GetInt32("idInmueble"));
+
+                        Contrato contrato = new()
+                        {
+                            Id = reader.GetInt32("id"),
+                            IdInquilino = inquilino.Id,
+                            Inquilino = inquilino,
+                            IdInmueble = inmueble.Id,
+                            Inmueble = inmueble,
+                            MontoMensual = reader.GetDouble("montoMensual"),
+                            FechaInicio = reader.GetDateTime("fechaInicio"),
+                            FechaFin = reader.GetDateTime("fechaFin"),
+                            Estado = reader.GetBoolean("estado"),
+
+                        };
+
+                        contratos.Add(contrato);
+                    }
+                    connection.Close();
+                }
+            }
+        }
+
+        return contratos;
+    }
+    public List<Contrato> GetAllContratosInmueble(int idInmueble)
+    {
+
+        List<Contrato> contratos = new();
+        string query = @"SELECT `id`, `idInquilino`, `idInmueble`, `montoMensual`, `fechaInicio`, `fechaFin`, `estado` 
+        FROM `contratos` 
+        WHERE `idInmueble` =@idInmueble  and estado = 1";
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            connection.Open();
+
+
+            InquilinosRepository inquilinosRepo = new();
+            InmueblesRepository inmueblesRepo = new();
+            using (MySqlCommand command = new(query, connection))
+            {
+                command.Parameters.AddWithValue("@idInmueble", idInmueble);
+
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -158,40 +206,6 @@ public class ContratosRepository
         }
         return contrato;
     }
-    // public List<String> GetEnumsTipes(string atributo)
-    // {
-
-    //     {
-    //         List<string> enumValues = new List<string>();
-
-    //         using (MySqlConnection connection = new MySqlConnection(connectionString))
-    //         {
-    //             connection.Open();
-
-    //             string query = $"SHOW COLUMNS FROM inmuebles LIKE '{atributo}'";
-
-    //             using (MySqlCommand command = new MySqlCommand(query, connection))
-    //             {
-    //                 using (MySqlDataReader reader = command.ExecuteReader())
-    //                 {
-    //                     if (reader.Read())
-    //                     {
-    //                         string enumDefinition = reader["Type"].ToString();
-    //                         enumDefinition = enumDefinition.Replace("enum(", "").Replace(")", "");
-    //                         string[] enumOptions = enumDefinition.Split(',');
-
-    //                         foreach (string option in enumOptions)
-    //                         {
-    //                             enumValues.Add(option.Trim('\''));
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-
-    //         return enumValues;
-    //     }
-    // }
 
     public int CreateContrato(Contrato contrato)
     {
@@ -249,7 +263,6 @@ public class ContratosRepository
         return res;
 
     }
-
 
     public int DeleteContrato(int id)
     {

@@ -38,6 +38,14 @@ public class ContratosController : Controller
         return View("Index", contratos);
 
     }
+    public IActionResult FiltrarPorInmueble(int id)
+    {
+        ContratosRepository repo = new();
+        List<Contrato> contratos = repo.GetAllContratosInmueble(id);
+        
+        return View("Index", contratos);
+
+    }
     public IActionResult Create()
     {
         return View();
@@ -89,6 +97,7 @@ public class ContratosController : Controller
             ContratosRepository repo = new();
             InquilinosRepository repoInquilino = new();
             PagosRepository repoPago = new();
+            string RefererUrl = Request.Headers["Referer"].ToString();
 
             if (string.IsNullOrWhiteSpace(resignacion))
             {
@@ -147,7 +156,7 @@ public class ContratosController : Controller
 
             }
 
-            return RedirectToAction("Index");
+            return Redirect(RefererUrl);
         }
         catch (Exception ex)
         {
@@ -160,6 +169,7 @@ public class ContratosController : Controller
     {
         ContratosRepository repo = new();
         var contrato = repo.GetContratoById(id);
+        TempData["RefererUrl"] = Request.Headers["Referer"].ToString();
         return View(contrato);
     }
 
@@ -167,13 +177,22 @@ public class ContratosController : Controller
     public IActionResult Update(Contrato contrato)
     {
         ContratosRepository repo = new();
+        string? returnUrl = TempData["RefererUrl"]?.ToString();
         int res = repo.UpdateContrato(contrato);
         if (res > 0)
         {
 
             TempData["AlertMessage"] = "Contrato modificado correctamente.";
             TempData["AlertType"] = "success";
-            return RedirectToAction("Index");
+           if (!string.IsNullOrEmpty(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                // Maneja el caso en el que no haya URL de referencia
+                return RedirectToAction("Index");
+            }
         }
         else if (res == -1)
         {

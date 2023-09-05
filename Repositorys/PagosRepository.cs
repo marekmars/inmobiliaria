@@ -11,9 +11,10 @@ public class PagosRepository
 {
 
     protected readonly string connectionString;
+    
     public PagosRepository()
     {
-        connectionString = "Server=localhost;User=root;Password=;Database=inmobiliaria;SslMode=none";
+       connectionString = Conexion.GetConnection;
     }
 
     //     public List<Contrato> GetAllContratos()

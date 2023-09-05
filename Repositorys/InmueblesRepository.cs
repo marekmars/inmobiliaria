@@ -24,9 +24,10 @@ public class InmueblesRepository
 
 
     protected readonly string connectionString;
+    
     public InmueblesRepository()
     {
-        connectionString = "Server=localhost;User=root;Password=;Database=inmobiliaria;SslMode=none";
+        connectionString = Conexion.GetConnection;
     }
 
     public List<Inmueble> GetAllInmuebles()

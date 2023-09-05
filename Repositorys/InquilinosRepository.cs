@@ -10,9 +10,10 @@ public class InquilinosRepository
 {
 
     protected readonly string connectionString;
+    
     public InquilinosRepository()
     {
-        connectionString = "Server=localhost;User=root;Password=;Database=inmobiliaria;SslMode=none";
+        connectionString = Conexion.GetConnection;
     }
     public List<Inquilino> GetAllInquilinos()
     {

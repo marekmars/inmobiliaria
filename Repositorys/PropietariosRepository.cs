@@ -11,9 +11,10 @@ public class PropietariosRepository
 {
 
     protected readonly string connectionString;
+    
     public PropietariosRepository()
     {
-        connectionString = "Server=localhost;User=root;Password=;Database=inmobiliaria;SslMode=none";
+        connectionString = Conexion.GetConnection;
     }
     public List<Propietario> GetAllPropietarios()
     {
