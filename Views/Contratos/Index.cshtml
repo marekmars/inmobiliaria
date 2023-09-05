@@ -49,10 +49,15 @@
                     }
                 }
             </div>
-            <div class="col-1 d-flex justify-content-end">
+             @if (ViewBag.Disponibles != null)
+            {
+               <div class="col-1 d-flex justify-content-end">
                 <a href="/Contratos/Create" class="btn btn-success " title="Crear"> <i
                         class="fa-solid fa-circle-plus "></i></a>
             </div>
+
+            }
+            
 
 
         </div>
