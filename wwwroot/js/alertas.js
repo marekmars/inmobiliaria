@@ -17,7 +17,7 @@ function confirmarEliminacion(event) {
 function confirmarEliminacionTotal(event) {
   event.preventDefault();
   Swal.fire({
-    title: "¿Estás seguro de eliminar el registro, se eliminaran todos los datos asociados a este mismo?",
+    title: "¿Estás seguro de eliminar el registro, se daran de baja los inmuebles relacionados con este propietario?",
     icon: "warning",
     showCancelButton: true,
     confirmButtonColor: "#d33",

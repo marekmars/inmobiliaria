@@ -162,11 +162,13 @@
 
 
             <div class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
+                
                 <button type="button" class="btn btn-primary mx-auto" style="width: fit-content;"
-                    onclick="window.location.href = '/Inmuebles'"><i class="fa-solid fa-circle-left"></i></button>
+                    onclick="window.history.back()"><i class="fa-solid fa-circle-left"></i></button>
                 <button id="btnRegistrar" type="submit" class="btn btn-success mx-auto" style="width: fit-content;"><i
                         class="fa-solid fa-building-circle-check"></i></button>
             </div>
+            <input type="hidden" id="urlReferencia" name="urlReferencia" value="" />
         </form>
 
     </div>
@@ -190,4 +192,8 @@
                       });
         </text>
     }
+</script>
+<script>
+    
+    document.getElementById("urlReferencia").value = document.referrer;
 </script>

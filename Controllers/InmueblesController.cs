@@ -15,13 +15,41 @@ public class InmueblesController : Controller
         _logger = logger;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(int id)
+    {
+        if (id == 0)
+        {
+            Console.WriteLine($"id: {id}");
+            InmueblesRepository repo = new();
+            List<Inmueble> inmueble = repo.GetAllInmuebles();
+            ViewBag.Disponibles = false;
+            return View(inmueble);
+        }
+        else
+        {
+
+            return IndexInmueblesPropietario(id);
+        }
+
+    }
+    public IActionResult IndexDisponibles(int id)
     {
         InmueblesRepository repo = new();
-        List<Inmueble> inmueble = repo.GetAllInmuebles();
+        List<Inmueble> inmueble = repo.GetAllInmueblesDisponibles();
         Console.WriteLine(inmueble[0]);
+        ViewBag.Disponibles = true;
+        return View("Index", inmueble);
 
-        return View(inmueble);
+    }
+    public IActionResult IndexInmueblesPropietario(int id)
+    {
+        InmueblesRepository repo = new();
+        PropietariosRepository repoPropietarios = new();
+         ViewBag.NombrePropietario=repoPropietarios.GetPropietarioById(id).ToString();
+        List<Inmueble> inmuebles = repo.GetInmueblesPropietario(id);
+          
+
+        return View("Index", inmuebles);
     }
     public IActionResult Create()
     {
@@ -38,6 +66,7 @@ public class InmueblesController : Controller
     [HttpPost]
     public IActionResult Create(Inmueble inmueble)
     {
+
         try
         {
             InmueblesRepository repo = new();
@@ -72,7 +101,9 @@ public class InmueblesController : Controller
 
             InmueblesRepository repo = new();
             Inmueble inmueble = repo.GetInmuebleById(id);
-            Console.WriteLine("ESTADO INMUEBLE: " + inmueble.Estado);
+            string returnUrl = Request.Headers["Referer"].ToString();
+            Uri refererUri = new Uri(returnUrl);
+            string relativePath = refererUri.GetComponents(UriComponents.PathAndQuery, UriFormat.SafeUnescaped);
 
             if (inmueble.Disponible)
             {
@@ -88,7 +119,7 @@ public class InmueblesController : Controller
             }
             repo.UpdateInmuebleDisponible(inmueble);
 
-            return RedirectToAction("index");
+            return Redirect(relativePath);
         }
         catch (System.Exception)
         {
@@ -101,11 +132,14 @@ public class InmueblesController : Controller
     [Authorize(Policy = "Administrador")]
     public IActionResult Delete(int id)
     {
+        string returnUrl = Request.Headers["Referer"].ToString();
+        Uri refererUri = new Uri(returnUrl);
+        string relativePath = refererUri.GetComponents(UriComponents.PathAndQuery, UriFormat.SafeUnescaped);
         try
         {
             InmueblesRepository repo = new();
             repo.DeleteInmueble(id);
-            return RedirectToAction("Index");
+            return Redirect(relativePath);
         }
         catch (System.Exception)
         {
@@ -118,6 +152,7 @@ public class InmueblesController : Controller
         var inmueble = repo.GetInmuebleById(id);
         var enumTipo = repo.getEnumTipos();
         var enumUso = repo.getEnumUso();
+        TempData["RefererUrl"] = Request.Headers["Referer"].ToString();
         ViewBag.enumTipo = enumTipo;
         ViewBag.enumUso = enumUso;
         return View(inmueble);
@@ -128,13 +163,22 @@ public class InmueblesController : Controller
     {
         InmueblesRepository repo = new();
         Console.WriteLine(inmueble.ToString());
+        string? returnUrl = TempData["RefererUrl"]?.ToString();
         int res = repo.UpdateInmueble(inmueble);
         if (res > 0)
         {
 
             TempData["AlertMessage"] = "Inmueble modificado correctamente.";
             TempData["AlertType"] = "success";
-            return RedirectToAction("Index");
+            if (!string.IsNullOrEmpty(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                // Maneja el caso en el que no haya URL de referencia
+                return RedirectToAction("Index");
+            }
         }
         else
         {
@@ -203,7 +247,7 @@ public class InmueblesController : Controller
             {
                 if (string.IsNullOrEmpty(searchTerm))
                 {
-                    var inmueblesActivos = inmuebles.Where(i => i.Estado == true&&
+                    var inmueblesActivos = inmuebles.Where(i => i.Estado == true &&
                     i.Disponible == true).ToList();
                     return Json(inmueblesActivos); // Retorna los inmuebles activos si no hay término de búsqueda
                 }

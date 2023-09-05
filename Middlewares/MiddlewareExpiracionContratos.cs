@@ -30,7 +30,7 @@ namespace Inmobiliaria.Controllers
         {
             Console.WriteLine("Ejecutando Middleware");
             ContratosRepository repo= new();
-            var contratos = repo.GetAllContratos();
+            var contratos = repo.GetAllContratos(true);
             foreach (var contrato in contratos)
             {
                 if (contrato.FechaFin < DateTime.Now)

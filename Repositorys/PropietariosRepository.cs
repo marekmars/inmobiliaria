@@ -55,7 +55,7 @@ public class PropietariosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM propietarios WHERE id=@id and estado=1 ORDER BY apellido";
+            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM propietarios WHERE id=@id  ORDER BY apellido";
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -87,7 +87,7 @@ public class PropietariosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM propietarios WHERE  dni=@dni and estado=1 ORDER BY apellido";
+            string query = "SELECT id, dni, apellido, nombre, telefono, correo FROM propietarios WHERE  dni=@dni ORDER BY apellido";
 
             using (MySqlCommand command = new(query, connection))
             {
@@ -181,7 +181,10 @@ public class PropietariosRepository
         var res = -1;
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-           string query = @"UPDATE `propietarios` SET `estado` = 0 WHERE `id` = @Id;";
+            string query = @"UPDATE propietarios p
+                             INNER JOIN inmuebles i ON p.id = i.idPropietario
+                             SET p.estado = 0, i.estado = 0
+                             WHERE p.id = @Id;";
 
 
             using (MySqlCommand command = new(query, connection))

@@ -16,17 +16,75 @@ public class ContratosRepository
         connectionString = "Server=localhost;User=root;Password=;Database=inmobiliaria;SslMode=none";
     }
 
-    public List<Contrato> GetAllContratos()
+    public List<Contrato> GetAllContratos(bool vig)
     {
+        Console.WriteLine("vigentes: " + vig);
         List<Contrato> contratos = new();
+        string query;
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             connection.Open();
-            string query = "SELECT `id`, `idInquilino`, `idInmueble`,`montoMensual`, `fechaInicio`, `fechaFin`, `estado` FROM `contratos` ";
+            if (vig)
+            {
+                query = "SELECT `id`, `idInquilino`, `idInmueble`,`montoMensual`, `fechaInicio`, `fechaFin`, `estado` FROM `contratos` WHERE `estado` = 1";
+            }
+            else
+            {
+                query = "SELECT `id`, `idInquilino`, `idInmueble`,`montoMensual`, `fechaInicio`, `fechaFin`, `estado` FROM `contratos` ";
+            }
+
             InquilinosRepository inquilinosRepo = new();
             InmueblesRepository inmueblesRepo = new();
             using (MySqlCommand command = new(query, connection))
             {
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Inquilino inquilino = inquilinosRepo.GetInquilinoById(reader.GetInt32("idInquilino"));
+                        Inmueble inmueble = inmueblesRepo.GetInmuebleById(reader.GetInt32("idInmueble"));
+
+                        Contrato contrato = new()
+                        {
+                            Id = reader.GetInt32("id"),
+                            IdInquilino = inquilino.Id,
+                            Inquilino = inquilino,
+                            IdInmueble = inmueble.Id,
+                            Inmueble = inmueble,
+                            MontoMensual = reader.GetDouble("montoMensual"),
+                            FechaInicio = reader.GetDateTime("fechaInicio"),
+                            FechaFin = reader.GetDateTime("fechaFin"),
+                            Estado = reader.GetBoolean("estado"),
+
+                        };
+
+                        contratos.Add(contrato);
+                    }
+                    connection.Close();
+                }
+            }
+        }
+
+        return contratos;
+    }
+    public List<Contrato> GetAllContratosFecha(DateTime desde, DateTime hasta)
+    {
+
+        List<Contrato> contratos = new();
+        string query = @"SELECT `id`, `idInquilino`, `idInmueble`, `montoMensual`, `fechaInicio`, `fechaFin`, `estado` 
+        FROM `contratos` 
+        WHERE `fechaInicio` <=@Hasta  AND `fechaFin` >= @Desde";
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            connection.Open();
+
+
+            InquilinosRepository inquilinosRepo = new();
+            InmueblesRepository inmueblesRepo = new();
+            using (MySqlCommand command = new(query, connection))
+            {
+                command.Parameters.AddWithValue("@Desde", desde);
+                command.Parameters.AddWithValue("@Hasta", hasta);
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -138,7 +196,7 @@ public class ContratosRepository
     public int CreateContrato(Contrato contrato)
     {
         var res = -1;
-    
+
 
         bool disponibilidad = VerificarDisponibilidad(contrato);
         Console.WriteLine("ENTRO CONTRATOS");
@@ -217,11 +275,11 @@ public class ContratosRepository
     public int UpdateContrato(Contrato contrato)
     {
         var res = -1;
- 
-        bool disponibilidad = VerificarDisponibilidad(contrato);
-        
 
-        if (contrato.IdInquilino != 0 && contrato.IdInmueble != 0&& contrato.MontoMensual != 0 && contrato.FechaFin != DateTime.MinValue &&
+        bool disponibilidad = VerificarDisponibilidad(contrato);
+
+
+        if (contrato.IdInquilino != 0 && contrato.IdInmueble != 0 && contrato.MontoMensual != 0 && contrato.FechaFin != DateTime.MinValue &&
             contrato.FechaInicio != DateTime.MinValue)
         {
             if (!disponibilidad)
@@ -229,7 +287,7 @@ public class ContratosRepository
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
                     string query = @"UPDATE `contratos` SET `fechaInicio` = @fechaInicio,`fechaFin` = @fechaFin,`montoMensual`= @montoMensual,
-                   `idInquilino` = @idInquilino , `idInmueble` = @idInmueble WHERE `id`= @Id" ;
+                   `idInquilino` = @idInquilino , `idInmueble` = @idInmueble WHERE `id`= @Id";
 
                     using (MySqlCommand command = new(query, connection))
                     {

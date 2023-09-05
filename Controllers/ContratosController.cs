@@ -17,8 +17,26 @@ public class ContratosController : Controller
     public IActionResult Index()
     {
         ContratosRepository repo = new();
-        List<Contrato> contratos = repo.GetAllContratos();
+
+        List<Contrato> contratos = repo.GetAllContratos(false);
+        ViewBag.Disponibles = false;
         return View(contratos);
+    }
+    public IActionResult IndexDisponibles()
+    {
+        ContratosRepository repo = new();
+        List<Contrato> contratos = repo.GetAllContratos(true);
+        ViewBag.Disponibles = true;
+        return View("Index", contratos);
+
+    }
+    public IActionResult FiltrarPorFecha(DateTime Desde,DateTime Hasta)
+    {
+        ContratosRepository repo = new();
+        List<Contrato> contratos = repo.GetAllContratosFecha(Desde,Hasta);
+        ViewBag.Disponibles = true;
+        return View("Index", contratos);
+
     }
     public IActionResult Create()
     {
@@ -184,7 +202,7 @@ public class ContratosController : Controller
     {
         // Aquí, realiza la lógica para obtener todos los contratos
         ContratosRepository repo = new();
-        List<Contrato> contrato = repo.GetAllContratos(); // Tu lógica para obtener todos los contratos
+        List<Contrato> contrato = repo.GetAllContratos(true); // Tu lógica para obtener todos los contratos
 
         if (contrato.Count > 0)
         {
