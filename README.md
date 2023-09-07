@@ -43,7 +43,7 @@ El proyecto se divide en diferentes entidades y funcionalidades clave:
 
 5. Explora las funcionalidades disponibles y utiliza los informes para obtener información relevante sobre los alquileres y propiedades.
 
-6. Usuarios:
+6. Usuarios.
 - Correo: maria@mail.com Clave:123456 Rol:Administrador
 - Correo: juan@mail.com Clave:123456 Rol:Empleado
 
