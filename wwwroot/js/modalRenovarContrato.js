@@ -33,8 +33,10 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("Inquilino").classList.add("d-none");
         document.getElementById("formInputs").classList.remove("d-none");
         document.getElementById("datosInmueble").classList.remove("d-none");
+        document.getElementById("formDates").classList.remove("d-none");
         document.getElementById("btnBuscarInmueble").classList.add("d-none");
         document.getElementById("cardInmueble").classList.remove("d-none");
+        document.getElementById("fechaFin").disabled=false;
         document
           .getElementById("inmuebleCantAmbientes")
           .parentElement.classList.add("d-none");

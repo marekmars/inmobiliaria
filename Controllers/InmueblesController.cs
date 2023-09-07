@@ -9,6 +9,7 @@ namespace Inmobiliaria.Controllers;
 public class InmueblesController : Controller
 {
     private readonly ILogger<InmueblesController> _logger;
+    private readonly InmueblesRepository _repo=new();
 
     public InmueblesController(ILogger<InmueblesController> logger)
     {
@@ -21,7 +22,7 @@ public class InmueblesController : Controller
         {
             Console.WriteLine($"id: {id}");
             InmueblesRepository repo = new();
-            List<Inmueble> inmueble = repo.GetAllInmuebles();
+            List<Inmueble> inmueble = _repo.GetAllInmuebles();
             ViewBag.Disponibles = false;
             return View(inmueble);
         }
@@ -212,30 +213,30 @@ public class InmueblesController : Controller
         }
     }
 
-    [HttpGet("api/Inmuebles/GetInmuebles")]
-    public IActionResult GetAllInmuebles()
-    {
+    // [HttpGet("api/Inmuebles/GetInmuebles")]
+    // public IActionResult GetAllInmuebles()
+    // {
 
-        InmueblesRepository repo = new();
-        List<Inmueble> inmuebles = repo.GetAllInmuebles();
-        Console.WriteLine(inmuebles[1].ToString());
+    //     InmueblesRepository repo = new();
+    //     List<Inmueble> inmuebles = repo.GetAllInmuebles();
+    //     Console.WriteLine(inmuebles[1].ToString());
 
-        if (inmuebles.Count > 0)
-        {
+    //     if (inmuebles.Count > 0)
+    //     {
 
-            return Ok(inmuebles);
-        }
-        else
-        {
-            return NotFound();
-        }
-    }
+    //         return Ok(inmuebles);
+    //     }
+    //     else
+    //     {
+    //         return NotFound();
+    //     }
+    // }
 
     [HttpGet("Inmuebles/FiltrarInmuebles")]
-    public IActionResult FiltrarInmuebles([FromQuery] string searchTerm)
+    public IActionResult FiltrarInmuebles([FromQuery] string searchTerm,[FromQuery] DateTime fechaInicio, [FromQuery] DateTime fechaFin)
     {
         Console.WriteLine("ENTRO");
-        IActionResult result = GetAllInmuebles();
+        IActionResult result = Ok(_repo.GetAllInmueblesFecha(fechaInicio, fechaFin));
         // Obtener el resultado
 
         if (result is OkObjectResult okObjectResult)

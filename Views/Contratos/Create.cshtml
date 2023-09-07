@@ -71,6 +71,18 @@
             </div>
           <input id="idInquilino" class="form-control" type="hidden" name="IdInquilino" required>
         </div>
+         <div class="container d-none d-flex flex-column gap-3" id="formDates">  
+             <div id="fechaInicioContainer"class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center ">
+              <input id="fechaInicio"  class="form-control" type="date" name="FechaInicio" placeholder="sad" required onchange="document.getElementById('fechaFin').min = document.getElementById('fechaInicio').value">
+              <label for="FechaInicio" class="ms-2">Fecha de Inicio</label>
+             </div>
+     
+             <div id="fechaFinContainer" class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center ">
+                 <input id="fechaFin"  class="form-control" type="date" name="FechaFin" placeholder="sad" disabled required>
+                 <label for="FechaFin" class="ms-2">Fecha de Finalizacion</label>
+             </div>
+             <input id="estado" value=true class="form-control" type="hidden" name="Estado" placeholder="sad" required>    
+        </div>
         <div id="datosInmueble" class="container d-none" >    
             <div class="d-flex gap-3 form-floating justify-content align-items-center mx-auto col-md-8 text-center">
                 <input id="busquedaId" disabled class="form-control" type="text" placeholder="sadas" required>
@@ -124,15 +136,6 @@
                  <label for="MontoMensual" class="ms-2">Monto Mensual $</label>
              </div>
 
-             <div id="fechaInicioContainer"class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center ">
-              <input id="fechaInicio"  class="form-control" type="date" name="FechaInicio" placeholder="sad" required onchange="document.getElementById('fechaFin').min = document.getElementById('fechaInicio').value">
-              <label for="FechaInicio" class="ms-2">Fecha de Inicio</label>
-             </div>
-     
-             <div id="fechaFinContainer" class="d-flex gap-5 form-floating justify-content align-items-center mx-auto col-md-8 text-center ">
-                 <input id="fechaFin"  class="form-control" type="date" name="FechaFin" placeholder="sad" required>
-                 <label for="FechaFin" class="ms-2">Fecha de Finalizacion</label>
-             </div>
              <input id="estado" value=true class="form-control" type="hidden" name="Estado" placeholder="sad" required>
                 
             

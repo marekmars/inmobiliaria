@@ -1,10 +1,36 @@
 document.addEventListener("DOMContentLoaded", function () {
   const buscarModalInput = document.getElementById("inputInmueble");
+  const fechaInicioInput = document.getElementById("fechaInicio");
+  const fechaFinInput = document.getElementById("fechaFin");
+
+  fechaInicioInput.addEventListener("change", (event) => {
+    if (fechaInicioInput.value) {
+      fechaFinInput.disabled = false;
+    } else {
+      fechaFinInput.disabled = true;
+    }
+  });
+
+  fechaFinInput.addEventListener("change", (event) => {
+    if (fechaFinInput.value) {
+      document.getElementById("datosInmueble").classList.remove("d-none");
+    } else {
+      document.getElementById("datosInmueble").classList.add("d-none");
+    }
+  });
+
+  
 
   buscarModalInput.addEventListener("keyup", function () {
-    const searchTerm = buscarModalInput.value;
 
-    fetch(`/Inmuebles/FiltrarInmuebles?searchTerm=${searchTerm}`)
+    const searchTerm = buscarModalInput.value;
+    const fechaInicio=fechaInicioInput.value;
+    const fechaFin=fechaFinInput.value;
+
+
+    fetch(
+      `/Inmuebles/FiltrarInmuebles?searchTerm=${searchTerm}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`
+    )
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -24,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
           const inputGroupPrepend = document.createElement("div");
           inputGroupPrepend.classList.add("input-group-prepend", "d-flex");
           const labelGroup = document.createElement("div");
-          labelGroup.classList.add("d-flex", "flex-column")
+          labelGroup.classList.add("d-flex", "flex-column");
           const input = document.createElement("input");
           input.type = "radio";
           input.name = "inmuebleRadio";
@@ -34,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
           const label = document.createElement("label");
           const label2 = document.createElement("label");
           const label3 = document.createElement("label");
-          label.classList.add("form-check-label", "input-group-text","input-top");
+          label.classList.add("form-check-label", "input-group-text", "input-top");
           label.textContent =
             "Propietario: " +
             inmueble.propietario.nombre +
@@ -42,9 +68,9 @@ document.addEventListener("DOMContentLoaded", function () {
             inmueble.propietario.apellido +
             " - DNI: " +
             inmueble.propietario.dni;
-          label2.classList.add("form-check-label", "input-group-text","input-mid");
+          label2.classList.add("form-check-label", "input-group-text", "input-mid");
           label2.textContent = "Tipo: " + inmueble.tipo;
-          label3.classList.add("form-check-label", "input-group-text","input-bot");
+          label3.classList.add("form-check-label", "input-group-text", "input-bot");
           label3.textContent = "Direccion: " + inmueble.direccion;
 
           inputGroupPrepend.appendChild(input);
@@ -55,29 +81,27 @@ document.addEventListener("DOMContentLoaded", function () {
           inmueblesList.appendChild(inputGroup);
 
           input.addEventListener("change", function () {
-              if (input.checked) {
-                console.log(inmueble);
-                console.log(input.value);
-                document.getElementById("inmueblePropietario").textContent =
+            if (input.checked) {
+              console.log(inmueble);
+              console.log(input.value);
+              document.getElementById("inmueblePropietario").textContent =
                 inmueble.propietario.apellido + " " + inmueble.propietario.nombre;
-                document.getElementById("inmuebleDireccion").textContent =
+              document.getElementById("inmuebleDireccion").textContent =
                 inmueble.direccion;
-                document.getElementById("inmuebleUso").textContent =
-                inmueble.uso;
-                document.getElementById("inmuebleTipo").textContent =
-                inmueble.tipo;
-                document.getElementById("inmuebleCantAmbientes").textContent =
+              document.getElementById("inmuebleUso").textContent = inmueble.uso;
+              document.getElementById("inmuebleTipo").textContent = inmueble.tipo;
+              document.getElementById("inmuebleCantAmbientes").textContent =
                 inmueble.cantAmbientes;
-                document.getElementById("inmuebleLatitud").textContent = inmueble.latitud;
-                document.getElementById("inmuebleLongitud").textContent = inmueble.longitud;
-                document.getElementById("inmueblePrecio").textContent = "$"+inmueble.precio;
-                document.getElementById("idInmueble").value = inmueble.id;
-                document.getElementById("busquedaId").value = "Inmueble N°: " +inmueble.id;
-                document.getElementById("cardInmueble").classList.remove("d-none");
-                document.getElementById("formInputs").classList.remove("d-none");
-                document.getElementById("montoMensual").value = inmueble.precio;
-
-              }
+              document.getElementById("inmuebleLatitud").textContent = inmueble.latitud;
+              document.getElementById("inmuebleLongitud").textContent = inmueble.longitud;
+              document.getElementById("inmueblePrecio").textContent =
+                "$" + inmueble.precio;
+              document.getElementById("idInmueble").value = inmueble.id;
+              document.getElementById("busquedaId").value = "Inmueble N°: " + inmueble.id;
+              document.getElementById("cardInmueble").classList.remove("d-none");
+              document.getElementById("formInputs").classList.remove("d-none");
+              document.getElementById("montoMensual").value = inmueble.precio;
+            }
           });
         });
       })

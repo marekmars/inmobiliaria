@@ -62,7 +62,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("busquedaDni").value = inquilino.dni;
                 idInquilino.value = inquilino.id;
                 btnRegistrar.disabled = false;
-                document.getElementById("datosInmueble").classList.remove("d-none");
+                // document.getElementById("datosInmueble").classList.remove("d-none");
+                document.getElementById("formDates").classList.remove("d-none");
+                
               }
             });
           });

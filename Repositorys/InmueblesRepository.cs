@@ -24,7 +24,7 @@ public class InmueblesRepository
 
 
     protected readonly string connectionString;
-    
+
     public InmueblesRepository()
     {
         connectionString = Conexion.GetConnection;
@@ -103,6 +103,73 @@ public class InmueblesRepository
             {
                 using (MySqlDataReader reader = command.ExecuteReader())
                 {
+                    while (reader.Read())
+                    {
+                        Propietario propietario = propietariosRepo.GetPropietarioById(reader.GetInt32("idPropietario"));
+                        uso = reader.GetString("uso");
+                        tipo = reader.GetString("tipo");
+
+
+                        Inmueble inmueble = new()
+                        {
+                            Id = reader.GetInt32("id"),
+                            Propietario = propietario,
+                            IdPropietario = reader.GetInt32("idPropietario"),
+                            Direccion = reader.GetString("direccion"),
+                            CantAmbientes = reader.GetInt32("cantAmbientes"),
+                            Latitud = reader.GetDouble("latitud"),
+                            Longitud = reader.GetDouble("longitud"),
+                            Precio = reader.GetDouble("precio"),
+                            Estado = reader.GetBoolean("estado"),
+                            Disponible = reader.GetBoolean("disponible")
+                        };
+
+                        inmueble.Tipo = (EnumTipo)Enum.Parse(typeof(EnumTipo), tipo);
+                        inmueble.Uso = (EnumUso)Enum.Parse(typeof(EnumUso), uso);
+
+                        inmuebles.Add(inmueble);
+                    }
+                    connection.Close();
+                }
+            }
+        }
+
+        return inmuebles;
+    }
+    public List<Inmueble> GetAllInmueblesFecha(DateTime fechaInicio, DateTime fechaFin)
+    {
+
+        List<Inmueble> inmuebles = new();
+        PropietariosRepository propietariosRepo = new();
+
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            connection.Open();
+           string query = @"SELECT DISTINCT inmuebles.* FROM inmuebles
+LEFT JOIN contratos ON inmuebles.id = contratos.idInmueble
+AND (contratos.fechaFin >= @fechaInicio AND contratos.fechaInicio <= @fechaFin)
+WHERE contratos.id IS NULL OR contratos.estado = 0
+AND NOT EXISTS (
+    SELECT 1 FROM contratos c2
+    WHERE c2.idInmueble = inmuebles.id
+    AND (c2.fechaFin >= @fechaInicio AND c2.fechaInicio <= @fechaFin)
+    AND c2.estado = 1
+)
+
+";
+
+            string tipo = "";
+            string uso = "";
+
+
+            using (MySqlCommand command = new(query, connection))
+            {
+                command.Parameters.AddWithValue("@fechaInicio", fechaInicio);
+                command.Parameters.AddWithValue("@fechaFin", fechaFin);
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+
+
                     while (reader.Read())
                     {
                         Propietario propietario = propietariosRepo.GetPropietarioById(reader.GetInt32("idPropietario"));
@@ -235,7 +302,7 @@ public class InmueblesRepository
         }
         return inmueble;
     }
-   
+
     public int CreateInmueble(Inmueble inmueble)
     {
         var res = -1;
@@ -245,7 +312,7 @@ public class InmueblesRepository
         try
         {
             if (inmueble.Direccion != "" && inmueble.Uso.ToString() != "" && inmueble.Tipo.ToString() != "" && inmueble.CantAmbientes != 0 && inmueble.IdPropietario != 0
-                && inmueble.Latitud != 0 && inmueble.Longitud != 0 && inmueble.Precio != 0 )
+                && inmueble.Latitud != 0 && inmueble.Longitud != 0 && inmueble.Precio != 0)
             {
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
@@ -293,7 +360,7 @@ public class InmueblesRepository
         var res = -1;
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
-            string query = @"UPDATE `inmuebles` SET `estado` = 0 WHERE `id` = @Id;";
+            string query = @"UPDATE `inmuebles` SET `estado` = 0,`disponible` = 0 WHERE `id` = @Id;";
 
             using (MySqlCommand command = new(query, connection))
             {
