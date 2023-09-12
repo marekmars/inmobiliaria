@@ -14,6 +14,7 @@ public class ContratosController : Controller
         _logger = logger;
     }
 
+
     public IActionResult Index()
     {
         ContratosRepository repo = new();
@@ -22,6 +23,8 @@ public class ContratosController : Controller
         ViewBag.Disponibles = false;
         return View(contratos);
     }
+
+ 
     public IActionResult IndexDisponibles()
     {
         ContratosRepository repo = new();
@@ -30,10 +33,10 @@ public class ContratosController : Controller
         return View("Index", contratos);
 
     }
-    public IActionResult FiltrarPorFecha(DateTime Desde,DateTime Hasta)
+    public IActionResult FiltrarPorFecha(DateTime Desde, DateTime Hasta)
     {
         ContratosRepository repo = new();
-        List<Contrato> contratos = repo.GetAllContratosFecha(Desde,Hasta);
+        List<Contrato> contratos = repo.GetAllContratosFecha(Desde, Hasta);
         ViewBag.Disponibles = true;
         return View("Index", contratos);
 
@@ -42,7 +45,7 @@ public class ContratosController : Controller
     {
         ContratosRepository repo = new();
         List<Contrato> contratos = repo.GetAllContratosInmueble(id);
-        
+
         return View("Index", contratos);
 
     }
@@ -71,13 +74,13 @@ public class ContratosController : Controller
             {
                 TempData["AlertMessage"] = "No se pudo crear el Contrato, debido a un error en los datos ingresados";
                 TempData["AlertType"] = "error";
-                return RedirectToAction("Create");
+                return RedirectToAction("Index");
             }
             else
             {
                 TempData["AlertMessage"] = "No se pudo crear el Contrato, Ya existe uno para ese inmueble en la fecha seleccionada.";
                 TempData["AlertType"] = "error";
-                return RedirectToAction("Create");
+                return RedirectToAction("Index");
             }
 
         }
@@ -89,7 +92,7 @@ public class ContratosController : Controller
     }
 
     [HttpPost]
-    [Authorize(Policy="Administrador")]
+    [Authorize(Policy = "Administrador")]
     public IActionResult Delete(int id, string resignacion)
     {
         try
@@ -101,7 +104,7 @@ public class ContratosController : Controller
 
             if (string.IsNullOrWhiteSpace(resignacion))
             {
-                var pagos = repoPago.GetPagoByContratoId(id);                
+                var pagos = repoPago.GetPagoByContratoId(id);
                 repo.DeleteContrato(id);
             }
             else
@@ -138,7 +141,7 @@ public class ContratosController : Controller
                         TempData["AlertType"] = "warning";
 
 
-                        
+
                         contrato.FechaFin = fechaHoy;
                         repo.DeleteContrato(contrato.Id);
                         repo.UpdateContrato(contrato);
@@ -184,7 +187,7 @@ public class ContratosController : Controller
 
             TempData["AlertMessage"] = "Contrato modificado correctamente.";
             TempData["AlertType"] = "success";
-           if (!string.IsNullOrEmpty(returnUrl))
+            if (!string.IsNullOrEmpty(returnUrl))
             {
                 return Redirect(returnUrl);
             }

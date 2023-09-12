@@ -134,7 +134,10 @@
 
                 </div>
                 <div class="modal-body">
-                  <div id="modal-content"></div>
+                  <div id="modal-content">
+                    @Html.Partial("_Renovar", Model)
+
+                  </div>
                 </div>
 
 
@@ -147,18 +150,20 @@
 
           </div>
 
-         
 
         </div>
       </div>
     </div>
+
+   
+    
     <div class="form-group mt-3">
-      <button type="button" class="btn btn-primary mx-auto" style="width: fit-content"
-        onclick="window.history.back()">
+      <button type="button" class="btn btn-primary mx-auto" style="width: fit-content" onclick="window.history.back()">
         <i class="fa-solid fa-circle-left"></i>
       </button>
     </div>
   </div>
 </div>
 
-<script src="~/js/modalRenovarContrato.js" asp-append-version="true"></script>
+
+@* <script src="~/js/modalRenovarContrato.js" asp-append-version="true"></script> *@

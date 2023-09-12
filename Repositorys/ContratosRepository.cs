@@ -26,7 +26,7 @@ public class ContratosRepository
             connection.Open();
             if (vig)
             {
-                query = "SELECT `id`, `idInquilino`, `idInmueble`,`montoMensual`, `fechaInicio`, `fechaFin`, `estado` FROM `contratos` WHERE `estado` = 1";
+                query = "SELECT `id`, `idInquilino`, `idInmueble`,`montoMensual`, `fechaInicio`, `fechaFin`, `estado` FROM `contratos` WHERE `estado` = 1 AND fechaFin >= CURDATE()";
             }
             else
             {
@@ -355,5 +355,50 @@ public class ContratosRepository
             }
         }
     }
+    public List<Contrato> GetAllContratosVencidos()
+    {
+        List<Contrato> contratos = new();
+        string query;
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            connection.Open();
+            query = "SELECT `id`, `idInquilino`, `idInmueble`,`montoMensual`, `fechaInicio`, `fechaFin`, `estado` FROM `contratos` WHERE `estado` = 1 AND fechaFin <= CURDATE()";
+
+            InquilinosRepository inquilinosRepo = new();
+            InmueblesRepository inmueblesRepo = new();
+            using (MySqlCommand command = new(query, connection))
+            {
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Inquilino inquilino = inquilinosRepo.GetInquilinoById(reader.GetInt32("idInquilino"));
+                        Inmueble inmueble = inmueblesRepo.GetInmuebleById(reader.GetInt32("idInmueble"));
+
+                        Contrato contrato = new()
+                        {
+                            Id = reader.GetInt32("id"),
+                            IdInquilino = inquilino.Id,
+                            Inquilino = inquilino,
+                            IdInmueble = inmueble.Id,
+                            Inmueble = inmueble,
+                            MontoMensual = reader.GetDouble("montoMensual"),
+                            FechaInicio = reader.GetDateTime("fechaInicio"),
+                            FechaFin = reader.GetDateTime("fechaFin"),
+                            Estado = reader.GetBoolean("estado"),
+
+                        };
+
+                        contratos.Add(contrato);
+                    }
+                    connection.Close();
+                }
+            }
+        }
+
+        return contratos;
+    }
+    
 
 }
+

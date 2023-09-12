@@ -183,9 +183,13 @@ public class PropietariosRepository
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
             string query = @"UPDATE propietarios p
-                             INNER JOIN inmuebles i ON p.id = i.idPropietario
-                             SET p.estado = 0, i.estado = 0
-                             WHERE p.id = @Id;";
+                          LEFT JOIN inmuebles i ON p.id = i.idpropietario
+                          SET
+                              p.estado = 0,
+                              i.estado = 0,
+                              i.disponible = 0
+                          WHERE
+                              p.id = @id;";
 
 
             using (MySqlCommand command = new(query, connection))

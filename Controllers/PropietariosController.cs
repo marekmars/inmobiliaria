@@ -109,20 +109,19 @@ public class PropietariosController : Controller
         try
         {
             PropietariosRepository repo = new();
+
             InmueblesRepository repoInmo = new();
             ContratosRepository repoContrato = new();
             var inmuebles = repo.GetAllInmueblesPropietario(id);
 
-            if (inmuebles.Count > 0)
-            {
-                foreach (var inmueble in inmuebles)
-                {
-                    repoInmo.DeleteInmueble(inmueble.Id);
+            // if (inmuebles.Count > 0)
+            // {
+            //     foreach (var inmueble in inmuebles)
+            //     {
+            //         repoInmo.DeleteInmueble(inmueble.Id);
 
-                }
-            }
-
-
+            //     }
+            // }
 
             repo.DeletePropietario(id);
             return RedirectToAction("Index");

@@ -143,7 +143,7 @@ public class InquilinosController : Controller
 
                 TempData["AlertMessage"] = "Inquilino modificado correctamente.";
                 TempData["AlertType"] = "success";
-                return Redirect("Index");
+                return RedirectToAction("Index");
             }
             else if (res == -1)
             {

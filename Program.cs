@@ -37,7 +37,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseMiddleware<MiddlewareExpiracionContratos>();
+// app.UseMiddleware<MiddlewareExpiracionContratos>();
 
 app.UseAuthentication();
 app.UseAuthorization();
