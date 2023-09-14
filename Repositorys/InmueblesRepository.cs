@@ -22,7 +22,6 @@ public class InmueblesRepository
 
 
 
-
     protected readonly string connectionString;
 
     public InmueblesRepository()
@@ -282,6 +281,7 @@ AND NOT EXISTS (
                         inmueble = new()
                         {
                             Id = reader.GetInt32("id"),
+                            IdPropietario = propietario.Id, //
                             Propietario = propietario,
                             Direccion = reader.GetString("direccion"),
                             CantAmbientes = reader.GetInt32("cantAmbientes"),

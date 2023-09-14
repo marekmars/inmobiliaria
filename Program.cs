@@ -37,6 +37,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+
 // app.UseMiddleware<MiddlewareExpiracionContratos>();
 
 app.UseAuthentication();
@@ -45,6 +46,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+ 
 
 app.Run();
 

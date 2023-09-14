@@ -18,7 +18,7 @@ public class ContratosController : Controller
     public IActionResult Index()
     {
         ContratosRepository repo = new();
-
+    
         List<Contrato> contratos = repo.GetAllContratos(false);
         ViewBag.Disponibles = false;
         return View(contratos);
@@ -44,8 +44,10 @@ public class ContratosController : Controller
     public IActionResult FiltrarPorInmueble(int id)
     {
         ContratosRepository repo = new();
+        InmueblesRepository repoInmuebles=new();
         List<Contrato> contratos = repo.GetAllContratosInmueble(id);
-
+        ViewBag.idPropietario=repoInmuebles.GetInmuebleById(id).IdPropietario;
+        
         return View("Index", contratos);
 
     }

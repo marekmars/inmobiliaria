@@ -46,7 +46,8 @@ public class InmueblesController : Controller
     {
         InmueblesRepository repo = new();
         PropietariosRepository repoPropietarios = new();
-         ViewBag.NombrePropietario=repoPropietarios.GetPropietarioById(id).ToString();
+        ViewBag.NombrePropietario=repoPropietarios.GetPropietarioById(id).ToString();
+       
         List<Inmueble> inmuebles = repo.GetInmueblesPropietario(id);
           
 
